@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "905668922669",
+    "project_id": "fishcab-ab50d",
+    "storage_bucket": "fishcab-ab50d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:905668922669:android:fb3dd3a7117f0d446a17a4",
+        "android_client_info": {
+          "package_name": "com.example.fish_cab"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "905668922669-egn3a0hmi9ri1l1rl734nnm2lds7hcgk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-5juF31ve9wg3EUtIVvF6y40QkyJ3k4M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "905668922669-egn3a0hmi9ri1l1rl734nnm2lds7hcgk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

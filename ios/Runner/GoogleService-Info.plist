@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>905668922669-hm5hb6r1gt8ckeosp90dlim4p1aq0fr4.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.905668922669-hm5hb6r1gt8ckeosp90dlim4p1aq0fr4</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDMSCNCcpVIgR2qvhiFwSH6VlAXNAPBPFY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>905668922669</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.fishCab</string>
+	<key>PROJECT_ID</key>
+	<string>fishcab-ab50d</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fishcab-ab50d.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:905668922669:ios:f1efc2dd4bc72dd56a17a4</string>
+</dict>
+</plist>
