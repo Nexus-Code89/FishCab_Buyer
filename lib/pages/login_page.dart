@@ -68,12 +68,13 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 50),
+              const SizedBox(height: 25),
 
-              // logo
-              const Icon(
-                Icons.lock,
-                size: 100,
+              // plss replace with the LOGO path
+              Image.asset(
+                'lib/images/apple.png', // Replace with the actual path to your image
+                width: 100,
+                height: 100,
               ),
 
               const SizedBox(height: 50),
@@ -126,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
               // sign in button
               MyButton(
                 onTap: signUserIn,
-                text: "Log In",
+                text: "Sign In",
               ),
 
               const SizedBox(height: 50),

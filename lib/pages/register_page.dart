@@ -74,15 +74,16 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 50),
+              const SizedBox(height: 25),
 
-              // logo
-              const Icon(
-                Icons.lock,
-                size: 50,
+              // plss replace with the LOGO path
+              Image.asset(
+                'lib/images/apple.png', // Replace with the actual path to your image
+                width: 100,
+                height: 100,
               ),
 
-              const SizedBox(height: 25),
+              const SizedBox(height: 50),
 
               // let's create an account for you!
               Text(
@@ -110,6 +111,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 hintText: 'Password',
                 obscureText: true,
               ),
+              
+              const SizedBox(height: 10),
 
               // confirm password textfield
               MyTextField(
