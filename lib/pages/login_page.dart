@@ -15,11 +15,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   // text editing controllers
   final emailController = TextEditingController();
-
   final passwordController = TextEditingController();
 
   // sign user in method
-  void signUserIn() async {
+  void signUserIn() async { 
     // show loading circle
     showDialog(
       context: context,
@@ -33,9 +32,12 @@ class _LoginPageState extends State<LoginPage> {
     // try sign in
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
-      // pop loading circle
+          email: emailController.text, 
+          password: passwordController.text
+      );
+      //pop loading circle
       Navigator.pop(context);
+      //return AuthPage();
     } on FirebaseAuthException catch (e) {
       // pop loading circle
       Navigator.pop(context);
@@ -124,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
               // sign in button
               MyButton(
                 onTap: signUserIn,
-                text: "Sign In",
+                text: "Log In",
               ),
 
               const SizedBox(height: 50),

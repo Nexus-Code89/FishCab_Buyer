@@ -1,6 +1,5 @@
-import 'package:fish_cab/pages/login_or_register_page.dart';
+import 'package:fish_cab/pages/auth_page.dart';
 import 'package:flutter/material.dart';
-import 'pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginOrRegisterPage(),
+      home: AuthPage(),
     );
   }
 }
