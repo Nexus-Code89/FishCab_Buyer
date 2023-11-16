@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'login_page.dart';
+import 'login_view.dart';
 import 'register_page.dart';
 
 class LoginOrRegisterPage extends StatefulWidget {
@@ -11,7 +11,7 @@ class LoginOrRegisterPage extends StatefulWidget {
 }
 
 class _LoginOrRegisterPageState extends State<LoginOrRegisterPage> {
-  // initially show login paeg
+  // initially show login page
   bool showLoginPage = true;
 
   // toggle between login and register page
