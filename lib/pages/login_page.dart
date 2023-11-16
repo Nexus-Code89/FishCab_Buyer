@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   // sign user in method
-  void signUserIn() async { 
+  void signUserIn() async {
     // show loading circle
     showDialog(
       context: context,
@@ -31,10 +31,7 @@ class _LoginPageState extends State<LoginPage> {
 
     // try sign in
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text, 
-          password: passwordController.text
-      );
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: emailController.text, password: passwordController.text);
       //pop loading circle
       Navigator.pop(context);
       //return AuthPage();
@@ -72,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // plss replace with the LOGO path
               Image.asset(
-                'lib/images/apple.png', // Replace with the actual path to your image
+                'lib/images/logo.png', // Replace with the actual path to your image
                 width: 100,
                 height: 100,
               ),
