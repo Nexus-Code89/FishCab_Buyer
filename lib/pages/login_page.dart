@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // welcome back, you've been missed!
               Text(
-                'Welcome back you\'ve been missed!',
+                'Welcome back, you\'ve been missed!',
                 style: TextStyle(
                   color: Colors.grey[700],
                   fontSize: 16,
@@ -127,6 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                 text: "Sign In",
               ),
 
+/*
               const SizedBox(height: 50),
 
               // or continue with
@@ -171,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                   // apple button
                   SquareTile(imagePath: 'lib/images/apple.png')
                 ],
-              ),
+              ),*/
 
               const SizedBox(height: 50),
 

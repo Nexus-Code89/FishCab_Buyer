@@ -76,9 +76,8 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               const SizedBox(height: 25),
 
-              // plss replace with the LOGO path
               Image.asset(
-                'lib/images/apple.png', // Replace with the actual path to your image
+                'lib/images/logo.png', 
                 width: 100,
                 height: 100,
               ),
@@ -143,7 +142,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 onTap: signUserUp,
                 text: "Sign Up",
               ),
-
+/*
               const SizedBox(height: 50),
 
               // or continue with
@@ -189,7 +188,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   SquareTile(imagePath: 'lib/images/apple.png')
                 ],
               ),
-
+*/
               const SizedBox(height: 50),
 
               // not a member? register now
