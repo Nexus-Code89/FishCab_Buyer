@@ -58,32 +58,42 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
             child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 25),
-
-              // plss replace with the LOGO path
-              Image.asset(
-                'lib/images/logo.png', // Replace with the actual path to your image
-                width: 100,
-                height: 100,
-              ),
-
-              const SizedBox(height: 50),
-
-              // welcome back, you've been missed!
+              // Log In
               Text(
-                'Welcome back, you\'ve been missed!',
+                'Log In',
                 style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 16,
+                  color: Colors.black,
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+
+              // const SizedBox(height: 25),
+
+              // // plss replace with the LOGO path
+              // Image.asset(
+              //   'lib/images/logo.png', // Replace with the actual path to your image
+              //   width: 100,
+              //   height: 100,
+              // ),
+
+              // const SizedBox(height: 50),
+
+              // // welcome back, you've been missed!
+              // Text(
+              //   'Welcome back, you\'ve been missed!',
+              //   style: TextStyle(
+              //     color: Colors.grey[700],
+              //     fontSize: 16,
+              //   ),
+              // ),
 
               const SizedBox(height: 25),
 

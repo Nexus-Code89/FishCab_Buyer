@@ -83,7 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
             child: SingleChildScrollView(
@@ -92,22 +92,32 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               const SizedBox(height: 25),
 
-              Image.asset(
-                'lib/images/logo.png',
-                width: 100,
-                height: 100,
-              ),
-
-              const SizedBox(height: 50),
-
-              // let's create an account for you!
+              // Sign Up
               Text(
-                'Let\'s create an account for you!',
+                'Sign Up',
                 style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 16,
+                  color: Colors.black,
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+
+              // Image.asset(
+              //   'lib/images/logo.png',
+              //   width: 100,
+              //   height: 100,
+              // ),
+
+              // const SizedBox(height: 50),
+
+              // // let's create an account for you!
+              // Text(
+              //   'Let\'s create an account for you!',
+              //   style: TextStyle(
+              //     color: Colors.grey[700],
+              //     fontSize: 16,
+              //   ),
+              // ),
 
               const SizedBox(height: 25),
 
