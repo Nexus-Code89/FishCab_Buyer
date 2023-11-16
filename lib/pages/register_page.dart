@@ -84,135 +84,138 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Center(
-            child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 25),
+      body: DecoratedBox(
+        decoration: BoxDecoration(image: DecorationImage(image: AssetImage('lib/images/bg.png'), fit: BoxFit.cover)),
+        child: SafeArea(
+          child: Center(
+              child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 25),
 
-              // Sign Up
-              Text(
-                'Sign Up',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
+                // Sign Up
+                Text(
+                  'Sign Up',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
 
-              // Image.asset(
-              //   'lib/images/logo.png',
-              //   width: 100,
-              //   height: 100,
-              // ),
+                // Image.asset(
+                //   'lib/images/logo.png',
+                //   width: 100,
+                //   height: 100,
+                // ),
 
-              // const SizedBox(height: 50),
+                // const SizedBox(height: 50),
 
-              // // let's create an account for you!
-              // Text(
-              //   'Let\'s create an account for you!',
-              //   style: TextStyle(
-              //     color: Colors.grey[700],
-              //     fontSize: 16,
-              //   ),
-              // ),
+                // // let's create an account for you!
+                // Text(
+                //   'Let\'s create an account for you!',
+                //   style: TextStyle(
+                //     color: Colors.grey[700],
+                //     fontSize: 16,
+                //   ),
+                // ),
 
-              const SizedBox(height: 25),
+                const SizedBox(height: 25),
 
-              // firstname textfield
-              MyTextField(
-                controller: firstNameController,
-                hintText: 'First Name',
-                obscureText: false,
-              ),
+                // firstname textfield
+                MyTextField(
+                  controller: firstNameController,
+                  hintText: 'First Name',
+                  obscureText: false,
+                ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // last name textfield
-              MyTextField(
-                controller: lastNameController,
-                hintText: 'Last Name',
-                obscureText: false,
-              ),
+                // last name textfield
+                MyTextField(
+                  controller: lastNameController,
+                  hintText: 'Last Name',
+                  obscureText: false,
+                ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // email textfield
-              MyTextField(
-                controller: emailController,
-                hintText: 'Email',
-                obscureText: false,
-              ),
+                // email textfield
+                MyTextField(
+                  controller: emailController,
+                  hintText: 'Email',
+                  obscureText: false,
+                ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // password textfield
-              MyTextField(
-                controller: passwordController,
-                hintText: 'Password',
-                obscureText: true,
-              ),
+                // password textfield
+                MyTextField(
+                  controller: passwordController,
+                  hintText: 'Password',
+                  obscureText: true,
+                ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // confirm password textfield
-              MyTextField(
-                controller: confirmPasswordController,
-                hintText: 'Confirm Password',
-                obscureText: true,
-              ),
-              const SizedBox(height: 10),
+                // confirm password textfield
+                MyTextField(
+                  controller: confirmPasswordController,
+                  hintText: 'Confirm Password',
+                  obscureText: true,
+                ),
+                const SizedBox(height: 10),
 
-              // forgot password?
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                // forgot password?
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 35.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Forgot Password?',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                // sign up button
+                MyButton(
+                  onTap: signUserUp,
+                  text: "Sign Up",
+                ),
+
+                const SizedBox(height: 50),
+
+                // not a member? register now
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.grey[600]),
+                      'Already have an account?',
+                      style: TextStyle(color: Colors.grey[700]),
                     ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              // sign up button
-              MyButton(
-                onTap: signUserUp,
-                text: "Sign Up",
-              ),
-
-              const SizedBox(height: 50),
-
-              // not a member? register now
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Already have an account?',
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                  const SizedBox(width: 4),
-                  GestureDetector(
-                    onTap: widget.onTap,
-                    child: const Text(
-                      'Login now',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: const Text(
+                        'Login now',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        )),
+                  ],
+                )
+              ],
+            ),
+          )),
+        ),
       ),
     );
   }

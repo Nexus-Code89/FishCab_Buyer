@@ -59,110 +59,113 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Center(
-            child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Log In
-              Text(
-                'Log In',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
+      body: DecoratedBox(
+        decoration: BoxDecoration(image: DecorationImage(image: AssetImage('lib/images/bg.png'), fit: BoxFit.cover)),
+        child: SafeArea(
+          child: Center(
+              child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Log In
+                Text(
+                  'Log In',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
 
-              // const SizedBox(height: 25),
+                // const SizedBox(height: 25),
 
-              // // plss replace with the LOGO path
-              // Image.asset(
-              //   'lib/images/logo.png', // Replace with the actual path to your image
-              //   width: 100,
-              //   height: 100,
-              // ),
+                // // plss replace with the LOGO path
+                // Image.asset(
+                //   'lib/images/logo.png', // Replace with the actual path to your image
+                //   width: 100,
+                //   height: 100,
+                // ),
 
-              // const SizedBox(height: 50),
+                // const SizedBox(height: 50),
 
-              // // welcome back, you've been missed!
-              // Text(
-              //   'Welcome back, you\'ve been missed!',
-              //   style: TextStyle(
-              //     color: Colors.grey[700],
-              //     fontSize: 16,
-              //   ),
-              // ),
+                // // welcome back, you've been missed!
+                // Text(
+                //   'Welcome back, you\'ve been missed!',
+                //   style: TextStyle(
+                //     color: Colors.grey[700],
+                //     fontSize: 16,
+                //   ),
+                // ),
 
-              const SizedBox(height: 25),
+                const SizedBox(height: 25),
 
-              // email textfield
-              MyTextField(
-                controller: emailController,
-                hintText: 'Email',
-                obscureText: false,
-              ),
+                // email textfield
+                MyTextField(
+                  controller: emailController,
+                  hintText: 'Email',
+                  obscureText: false,
+                ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // password textfield
-              MyTextField(
-                controller: passwordController,
-                hintText: 'Password',
-                obscureText: true,
-              ),
+                // password textfield
+                MyTextField(
+                  controller: passwordController,
+                  hintText: 'Password',
+                  obscureText: true,
+                ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // forgot password?
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                // forgot password?
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 35.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Forgot Password?',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                // sign in button
+                MyButton(
+                  onTap: signUserIn,
+                  text: "Sign In",
+                ),
+
+                const SizedBox(height: 50),
+
+                // not a member? register now
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.grey[600]),
+                      'Not a member?',
+                      style: TextStyle(color: Colors.grey[700]),
                     ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              // sign in button
-              MyButton(
-                onTap: signUserIn,
-                text: "Sign In",
-              ),
-
-              const SizedBox(height: 50),
-
-              // not a member? register now
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Not a member?',
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                  const SizedBox(width: 4),
-                  GestureDetector(
-                    onTap: widget.onTap,
-                    child: const Text(
-                      'Register now',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: const Text(
+                        'Register now',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        )),
+                  ],
+                )
+              ],
+            ),
+          )),
+        ),
       ),
     );
   }
