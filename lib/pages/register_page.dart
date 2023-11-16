@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fish_cab/components/my_button.dart';
 import 'package:fish_cab/components/my_textfield.dart';
 import 'package:fish_cab/components/square_tile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -15,9 +16,13 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   // text editing controllers
   final emailController = TextEditingController();
-
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+
+  // call instance getter on FireStore to interact with it
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // sign user up method
   void signUserUp() async {
@@ -35,8 +40,19 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       // check if password is confirmed
       if (passwordController.text == confirmPasswordController.text) {
-        await FirebaseAuth.instance
+        // create credentials and return the created credetnial
+        UserCredential result = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: emailController.text, password: passwordController.text);
+        User? user = result.user;
+
+        // insert user information in the firestore
+        final data = {
+          "email": emailController.text,
+          "firstName": firstNameController.text,
+          "lastName": lastNameController.text,
+          "type": "buyer"
+        };
+        firestore.collection("users").doc(user?.uid).set(data, SetOptions(merge: true));
       } else {
         // show error message, passwords don't match
         showErrorMessage("Passwords don't match");
@@ -77,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 25),
 
               Image.asset(
-                'lib/images/logo.png', 
+                'lib/images/logo.png',
                 width: 100,
                 height: 100,
               ),
@@ -95,6 +111,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
               const SizedBox(height: 25),
 
+              // firstname textfield
+              MyTextField(
+                controller: firstNameController,
+                hintText: 'First Name',
+                obscureText: false,
+              ),
+
+              const SizedBox(height: 10),
+
+              // last name textfield
+              MyTextField(
+                controller: lastNameController,
+                hintText: 'Last Name',
+                obscureText: false,
+              ),
+
+              const SizedBox(height: 10),
+
               // email textfield
               MyTextField(
                 controller: emailController,
@@ -110,7 +144,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 hintText: 'Password',
                 obscureText: true,
               ),
-              
+
               const SizedBox(height: 10),
 
               // confirm password textfield
@@ -142,53 +176,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 onTap: signUserUp,
                 text: "Sign Up",
               ),
-/*
-              const SizedBox(height: 50),
 
-              // or continue with
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(
-                        'Or continue with',
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 50),
-
-              // google + apple sign in buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  // google button
-                  SquareTile(imagePath: 'lib/images/google.png'),
-
-                  SizedBox(width: 25),
-
-                  // apple button
-                  SquareTile(imagePath: 'lib/images/apple.png')
-                ],
-              ),
-*/
               const SizedBox(height: 50),
 
               // not a member? register now
