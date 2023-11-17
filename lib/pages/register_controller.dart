@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/pages/register_model.dart';
 import 'package:flutter/material.dart';
@@ -8,24 +9,39 @@ class RegisterController {
   // Constructor
   RegisterController(this._registerModel);
 
+  // call instance getter on FireStore to interact with it
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  // text controllers
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
 
   void signUp(BuildContext context) async {
     try {
-      // Check if password is confirmed
-      if (passwordController.text == confirmPasswordController.text) {
-        await _registerModel.signUp(
-          email: emailController.text,
-          password: passwordController.text,
-        );
-        // Navigate to the next page or perform any other action upon successful registration
-      } else {
-        // Show error message, passwords don't match
-        showErrorMessage(context, "Passwords don't match");
-      }
+      // // check if password is confirmed
+      // if (passwordController.text == confirmPasswordController.text) {
+      // create credentials and return the created credetnial
+      UserCredential result = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: emailController.text, password: passwordController.text);
+      User? user = result.user;
+
+      // insert user information in the firestore
+      final data = {
+        "email": emailController.text,
+        "firstName": firstNameController.text,
+        "lastName": lastNameController.text,
+        "type": "buyer"
+      };
+      firestore.collection("users").doc(user?.uid).set(data, SetOptions(merge: true));
+      // } else {
+      //   // show error message, passwords don't match
+      //   showErrorMessage(context, "Passwords don't match");
+      // }
     } on FirebaseAuthException catch (e) {
+      // show error message
       showErrorMessage(context, e.code);
     }
   }

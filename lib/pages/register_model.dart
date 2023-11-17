@@ -3,15 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 class RegisterModel {
   final FirebaseAuth _auth;
 
-  // Named Constructor
-  RegisterModel(this._auth);
+  // Constructor
+  RegisterModel() : _auth = FirebaseAuth.instance;
 
-  // Factory method to use default instance
-  factory RegisterModel.fromDefaultInstance() {
-    return RegisterModel(FirebaseAuth.instance);
-  }
-
-  Future<void> signUp({required String email, required String password}) async {
+  Future<void> signUp(
+      {required String email, required String password, required String firstName, required String lastName}) async {
     try {
       await _auth.createUserWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (e) {

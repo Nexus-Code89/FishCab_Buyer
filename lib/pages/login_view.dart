@@ -57,26 +57,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-                // const SizedBox(height: 25),
-
-                // // plss replace with the LOGO path
-                // Image.asset(
-                //   'lib/images/logo.png', // Replace with the actual path to your image
-                //   width: 100,
-                //   height: 100,
-                // ),
-
-                // const SizedBox(height: 50),
-
-                // // welcome back, you've been missed!
-                // Text(
-                //   'Welcome back, you\'ve been missed!',
-                //   style: TextStyle(
-                //     color: Colors.grey[700],
-                //     fontSize: 16,
-                //   ),
-                // ),
-
                 const SizedBox(height: 25),
 
                 // email textfield
