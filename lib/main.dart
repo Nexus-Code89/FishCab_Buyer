@@ -1,4 +1,8 @@
-import 'package:fish_cab/pages/auth_page.dart';
+import 'package:fish_cab/aunthentication%20pages/auth_page.dart';
+import 'package:fish_cab/home%20pages/chats_screen.dart';
+import 'package:fish_cab/home%20pages/home_page.dart';
+import 'package:fish_cab/home%20pages/notifications_screen.dart';
+import 'package:fish_cab/home%20pages/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -17,8 +21,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AuthPage(),
+      debugShowCheckedModeBanner: false, initialRoute: '/auth', // Set the initial route
+      routes: {
+        '/auth': (context) => const AuthPage(),
+        '/home': (context) => HomePage(),
+        '/search': (context) => SearchScreen(),
+        '/chats': (context) => ChatsScreen(),
+        '/notifications': (context) => NotificationsScreen(),
+      }
     );
   }
 }

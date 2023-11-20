@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fish_cab/pages/register_controller.dart';
-import 'package:fish_cab/pages/register_model.dart';
+import 'package:fish_cab/aunthentication%20pages/register_controller.dart';
+import 'package:fish_cab/aunthentication%20pages/register_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fish_cab/components/my_button.dart';
 import 'package:fish_cab/components/my_textfield.dart';

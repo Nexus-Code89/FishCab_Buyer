@@ -1,7 +1,7 @@
 import 'package:fish_cab/components/my_button.dart';
 import 'package:fish_cab/components/my_textfield.dart';
-import 'package:fish_cab/pages/login_controller.dart';
-import 'package:fish_cab/pages/login_model.dart';
+import 'package:fish_cab/aunthentication%20pages/login_controller.dart';
+import 'package:fish_cab/aunthentication%20pages/login_model.dart';
 import 'package:flutter/material.dart';
 
 // View
