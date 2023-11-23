@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fish_cab/seller_pages/seller_profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fish_cab/home%20pages/bottom_navigation_bar.dart';
 
@@ -112,15 +113,15 @@ class _SearchViewState extends State<SearchView> {
                   return ListTile(
                     // TODO: create the seller's ProfileView to be rendered when the profile_info is tapped.
                     // YT VID REFERENCE LINK: https://youtu.be/z0x1bIkn6Do?si=hBLbBQS5d9yYlTz6
-                    /*onTap: () {
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ProfileView(
+                            builder: (context) => SellerProfileView(
                                   userId: data['id'],
                                 )),
                       );
-                    },*/
+                    },
                     leading: CircleAvatar(
                       radius: 24,
                       //backgroundImage: NetworkImage(data['profileUrl']),

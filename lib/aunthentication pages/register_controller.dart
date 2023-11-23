@@ -30,6 +30,7 @@ class RegisterController {
 
       // insert user information in the firestore
       final data = {
+        "id": user?.uid,
         "email": emailController.text,
         "firstName": firstNameController.text,
         "lastName": lastNameController.text,
