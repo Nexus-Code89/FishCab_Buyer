@@ -21,14 +21,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, initialRoute: '/auth', // Set the initial route
-      routes: {
-        '/auth': (context) => const AuthPage(),
-        '/home': (context) => HomePage(),
-        '/search': (context) => SearchScreen(),
-        '/chats': (context) => ChatsScreen(),
-        '/notifications': (context) => NotificationsScreen(),
-      }
-    );
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/auth', // Set the initial route
+        routes: {
+          '/auth': (context) => const AuthPage(),
+          '/home': (context) => HomePage(),
+          '/search': (context) => SearchScreen(),
+          '/chats': (context) => ChatsScreen(),
+          '/notifications': (context) => NotificationsScreen(),
+        });
   }
 }
