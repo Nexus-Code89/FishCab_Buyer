@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fish_cab/chat/chat_service.dart';
+import 'package:fish_cab/components/chat_bubble.dart';
 import 'package:fish_cab/components/my_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:fish_cab/home pages/bottom_navigation_bar.dart';
@@ -41,7 +42,7 @@ class _ChatsPageState extends State<ChatsPage> with AutomaticKeepAliveClientMixi
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chats Screen'),
+        title: Text(widget.receiverUserEmail),
       ),
       body: Column(
         children: [
@@ -51,27 +52,10 @@ class _ChatsPageState extends State<ChatsPage> with AutomaticKeepAliveClientMixi
           ),
 
           // user input
-          _buildMessageInput()
+          _buildMessageInput(),
+
+          const SizedBox(height: 25),
         ],
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 2,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              // Navigate to HomeScreen
-              Navigator.pushReplacementNamed(context, '/home');
-              break;
-            case 1:
-              // Navigate to SearchScreen
-              Navigator.pushReplacementNamed(context, '/search');
-              break;
-            case 3:
-              // Navigate to NotificationsScreen
-              Navigator.pushReplacementNamed(context, '/notifications');
-              break;
-          }
-        },
       ),
     );
   }
@@ -103,32 +87,50 @@ class _ChatsPageState extends State<ChatsPage> with AutomaticKeepAliveClientMixi
     var alignment = (data['senderId'] == _firebaseAuth.currentUser!.uid) ? Alignment.centerRight : Alignment.centerLeft;
 
     return Container(
-      alignment: alignment,
-      // TO DO: change email to name
-      // TO DO: add chat bubbles
-      child: Column(children: [Text(data['senderEmail']), Text(data['message'])]),
-    );
+        // TO DO: change email to name
+
+        alignment: alignment,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+              crossAxisAlignment:
+                  (data['senderId'] == _firebaseAuth.currentUser!.uid) ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              mainAxisAlignment:
+                  (data['senderId'] == _firebaseAuth.currentUser!.uid) ? MainAxisAlignment.end : MainAxisAlignment.start,
+              children: [
+                Text(data['senderEmail']),
+                const SizedBox(height: 5),
+                (data['senderId'] == _firebaseAuth.currentUser!.uid)
+                    ? ChatBubble(message: data['message'], type: 'sender')
+                    : ChatBubble(message: data['message'], type: 'receiver')
+              ]),
+        ));
   }
 
   // build message input
   Widget _buildMessageInput() {
-    return Row(
-      children: [
-        Expanded(
-            child: MyTextField(
-          controller: _messageController,
-          hintText: 'Enter message',
-          obscureText: false,
-        )),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50.0),
+      child: Row(
+        children: [
+          Expanded(
+              child: MyTextField(
+            controller: _messageController,
+            hintText: 'Enter message',
+            obscureText: false,
+          )),
 
-        // send button
-        IconButton(
-            onPressed: sendMessage,
-            icon: Icon(
-              Icons.arrow_upward,
-              size: 40,
-            ))
-      ],
+          // send button
+          IconButton(
+              padding: EdgeInsets.zero,
+              onPressed: sendMessage,
+              icon: Icon(
+                Icons.arrow_upward,
+                size: 30,
+                color: Colors.blue,
+              ))
+        ],
+      ),
     );
   }
 }
