@@ -61,11 +61,11 @@ class SellerHomeScreen extends StatelessWidget {
                   switch (index) {
                     case 1:
                       // Navigate to Fish Options Page
-                      Navigator.pushReplacementNamed(context, '/seller_fish_options');
+                      Navigator.pushReplacementNamed(context, '/seller_fish_options_view');
                       break;
                     case 2:
                       // Navigate to Schedule Page
-                      Navigator.pushReplacementNamed(context, '/seller_schedule');
+                      Navigator.pushReplacementNamed(context, '/seller_schedule_view');
                       break;
                   }
                 },
