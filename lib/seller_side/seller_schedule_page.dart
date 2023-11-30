@@ -16,7 +16,7 @@ class SellerSchedulePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('This is the Schedul Page for Seller: $sellerId'),
+            Text('This is the Schedule Page for Seller: $sellerId'),
             // Add your form or input fields for schedule updates here
           ],
         ),
@@ -44,7 +44,3 @@ class SellerSchedulePage extends StatelessWidget {
     );
   }
 }
-
-      
-   
-    
