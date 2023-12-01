@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fish_cab/seller_pages/seller_singleton.dart';
+import 'package:fish_cab/seller_pages/seller_search_singleton.dart';
 import 'package:flutter/material.dart';
 
 class SellerProfileView extends StatelessWidget {
@@ -11,11 +11,11 @@ class SellerProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Update the userId in SellerSingleton
-    SellerSingleton.instance.userId = userId;
+    SellerSeacrhSingleton.instance.userId = userId;
 
     // Automatically navigate to the seller home screen
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      Navigator.of(context).pushReplacementNamed('/seller_home');
+      Navigator.of(context).pushReplacementNamed('/seller_home_view');
     });
 
     return Scaffold(

@@ -15,67 +15,65 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
 
   // sign user out method
   void signUserOut(BuildContext context) {
-  FirebaseAuth.instance.signOut().then((_) {
-    Navigator.pushReplacementNamed(context, '/auth'); // Navigate to AuthPage
-  }).catchError((error) {
-    // Handle error, if any
-    print("Error signing out: $error");
-  });
-  } 
-
-
+    FirebaseAuth.instance.signOut().then((_) {
+      Navigator.pushReplacementNamed(context, '/auth'); // Navigate to AuthPage
+    }).catchError((error) {
+      // Handle error, if any
+      print("Error signing out: $error");
+    });
+  }
 
   @override
-Widget build(BuildContext context) {
-  super.build(context);
-  return WillPopScope(
-    // Add a WillPopScope to handle the Android back button
-    onWillPop: () async {
-      // Handle the back button press
-      if (Navigator.of(context).canPop()) {
-        // If there are screens to pop, pop the current screen
-        Navigator.of(context).pop();
-        return false; // Return false to prevent the app from closing
-      } else {
-        return true; // Allow the app to close if there are no screens to pop
-      }
-    },
-    child: Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () => signUserOut(context), // Pass the context to the function
-            icon: Icon(Icons.logout),
+  Widget build(BuildContext context) {
+    super.build(context);
+    return WillPopScope(
+      // Add a WillPopScope to handle the Android back button
+      onWillPop: () async {
+        // Handle the back button press
+        if (Navigator.of(context).canPop()) {
+          // If there are screens to pop, pop the current screen
+          Navigator.of(context).pop();
+          return false; // Return false to prevent the app from closing
+        } else {
+          return true; // Allow the app to close if there are no screens to pop
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          actions: [
+            IconButton(
+              onPressed: () => signUserOut(context), // Pass the context to the function
+              icon: Icon(Icons.logout),
+            ),
+          ],
+        ),
+        body: Center(
+          child: Text(
+            user != null ? "LOGGED IN AS: ${user?.email}" : "NOT LOGGED IN",
+            style: TextStyle(fontSize: 20),
           ),
-        ],
-      ),
-      body: Center(
-        child: Text(
-          user != null ? "LOGGED IN AS: ${user?.email}" : "NOT LOGGED IN",
-          style: TextStyle(fontSize: 20),
+        ),
+        bottomNavigationBar: CustomBottomNavigationBar(
+          currentIndex: 0, // Set the default selected index
+          onTap: (index) {
+            // Handle item taps here, based on the index
+            switch (index) {
+              case 1:
+                // Navigate to SearchScreen
+                Navigator.pushReplacementNamed(context, '/search');
+                break;
+              case 2:
+                // Navigate to ChatsScreen
+                Navigator.pushReplacementNamed(context, '/chats');
+                break;
+              case 3:
+                // Navigate to NotificationsScreen
+                Navigator.pushReplacementNamed(context, '/notifications');
+                break;
+            }
+          },
         ),
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 0, // Set the default selected index
-        onTap: (index) {
-          // Handle item taps here, based on the index
-          switch (index) {
-            case 1:
-              // Navigate to SearchScreen
-              Navigator.pushReplacementNamed(context, '/search');
-              break;
-            case 2:
-              // Navigate to ChatsScreen
-              Navigator.pushReplacementNamed(context, '/chats');
-              break;
-            case 3:
-              // Navigate to NotificationsScreen
-              Navigator.pushReplacementNamed(context, '/notifications');
-              break;
-          }
-        },
-      ),
-    ),
-  );
-}
+    );
+  }
 }

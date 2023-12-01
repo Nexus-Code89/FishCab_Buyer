@@ -111,8 +111,6 @@ class _SearchViewState extends State<SearchView> {
                 itemBuilder: (context, index) {
                   var data = snapshot.data!.docs[index];
                   return ListTile(
-                    // TODO: create the seller's ProfileView to be rendered when the profile_info is tapped.
-                    // YT VID REFERENCE LINK: https://youtu.be/z0x1bIkn6Do?si=hBLbBQS5d9yYlTz6
                     onTap: () {
                       Navigator.push(
                         context,
