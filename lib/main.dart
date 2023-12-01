@@ -3,6 +3,8 @@ import 'package:fish_cab/home%20pages/chats_screen.dart';
 import 'package:fish_cab/home%20pages/home_page.dart';
 import 'package:fish_cab/home%20pages/notifications_screen.dart';
 import 'package:fish_cab/home%20pages/search_screen.dart';
+import 'package:fish_cab/review-rating%20pages/make_review_screen.dart';
+import 'package:fish_cab/review-rating%20pages/view_reviews_screen.dart';
 import 'package:fish_cab/seller_pages/seller_fish_options_screen.dart';
 import 'package:fish_cab/seller_pages/seller_home_screen.dart';
 import 'package:fish_cab/seller_pages/seller_schedule_screen.dart';
@@ -26,7 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: '/auth', // Set the initial route
+        initialRoute: '/make_review', // Set the initial route
         routes: {
           '/auth': (context) => const AuthPage(),
           '/home': (context) => HomePage(),
@@ -36,6 +38,7 @@ class MyApp extends StatelessWidget {
           '/seller_home':(context) => SellerHomeScreen(userId: SellerSingleton.instance.userId,),
           '/seller_schedule':(context) => SellerScheduleScreen(sellerId: SellerSingleton.instance.userId,),
           '/seller_fish_options':(context) => FishOptionsScreen(sellerId: SellerSingleton.instance.userId,),
+          '/make_review':(context) => ReviewView(reviewee: "JJc2ZatwgmPLF8clNr8mkWukqVl1",),
         });
   }
 }
