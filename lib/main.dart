@@ -7,10 +7,10 @@ import 'package:fish_cab/seller_pages/seller_fish_options_screen.dart';
 import 'package:fish_cab/seller_pages/seller_home_screen.dart';
 import 'package:fish_cab/seller_pages/seller_schedule_screen.dart';
 import 'package:fish_cab/seller_pages/seller_search_singleton.dart';
+import 'package:fish_cab/seller_side/seller_add_fish_option.dart';
 import 'package:fish_cab/seller_side/seller_fish_options_page.dart';
 import 'package:fish_cab/seller_side/seller_home_page.dart';
 import 'package:fish_cab/seller_side/seller_schedule_page.dart';
-import 'package:fish_cab/seller_side/seller_schedule_update.dart';
 import 'package:fish_cab/seller_side/seller_singleton.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -42,9 +42,8 @@ class MyApp extends StatelessWidget {
           '/seller_schedule_view':(context) => SellerScheduleScreen(sellerId: SellerSeacrhSingleton.instance.userId,),
           '/seller_fish_options_view':(context) => FishOptionsScreen(sellerId: SellerSeacrhSingleton.instance.userId,),
           '/seller_home':(context) => SellerHomePage(),
-          '/seller_schedule':(context) => SellerSchedulePage(sellerId: SellerSingleton.instance.userId,),
-          '/seller_fish_options':(context) => FishOptionsPage(),
-//'/schedule_update': (context) => ScheduleUpdatePage(),
+          '/seller_fish_options':(context) => FishOptionsPage(sellerId: SellerSingleton.instance.userId,),
+          '/add_fish_option':(context) => AddFishOptionPage(sellerId: SellerSingleton.instance.userId,),
         }
     );
   }
