@@ -121,7 +121,7 @@ class _SearchViewState extends State<SearchView> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => SellerProfileView(
-                                  userId: data['id'],
+                                  userId: data.id,
                                 )),
                       );
                     },
