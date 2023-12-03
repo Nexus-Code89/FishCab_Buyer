@@ -108,34 +108,48 @@ class FishOptionsList extends StatelessWidget {
         final fishName = fishOptionData['fishName'] as String?;
         final price = fishOptionData['price'] as num?;
 
-        if (photoUrl != null && fishName != null && price != null) {
-          return Card(
-            elevation: 3,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(photoUrl),
-              ),
-              title: Text(
-                fishName,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(
-                '\$$price',
-                style: TextStyle(fontSize: 16),
-              ),
-              // TODO: Implement onTap to show more details or perform other actions
-              onTap: () {
-                // TODO: Handle tap on fish option
+        return Card(
+          elevation: 3,
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ListTile(
+            leading: CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(photoUrl ?? ''),
+            ),
+            title: Text(
+              fishName ?? '',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              '\$$price',
+              style: TextStyle(fontSize: 16),
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                // Call a function to delete the fish option
+                _deleteFishOption(fishChoices[index].reference);
               },
             ),
-          );
-        }
+            onTap: () {
+              // TODO: Handle tap on fish option
+            },
+          ),
+        );
       }
 
       return Container(); // or any other fallback for null or incomplete data
     },
   );
 }
+
+  // Function to delete a fish option
+  Future<void> _deleteFishOption(DocumentReference fishOptionRef) async {
+      try {
+        await fishOptionRef.delete();
+        // Optionally, update the UI to reflect the deletion
+      } catch (e) {
+        print('Error deleting fish option: $e');
+      }
+  }
 }

@@ -96,11 +96,16 @@ class _SearchViewState extends State<SearchView> {
       body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('users')
+              .where('type', isEqualTo: 'seller')
               .orderBy('firstName')
-              .startAt([searchName]).endAt([searchName + "\uf8ff"]).snapshots(),
+              .startAt([searchName])
+              .endAt([searchName + "\uf8ff"])
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Text('Something went wrong');
+              print('Error: ${snapshot.error}');
+              return Text('Error: ${snapshot.error}');
+              //return Text('Something went wrong');
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
