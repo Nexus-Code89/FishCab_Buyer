@@ -47,42 +47,80 @@ class FishOptionsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Fetch actual fish options data from Firebase
-    // For now, use dummy data
-    List<Map<String, dynamic>> dummyFishOptions = [
-      {"fish": "Salmon", "photo": "salmon.jpg", "price": 15.99},
-      {"fish": "Tuna", "photo": "tuna.jpg", "price": 12.99},
-      {"fish": "Cod", "photo": "cod.jpg", "price": 9.99},
-    ];
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('seller_info')
+          .doc(sellerId)
+          .collection('fish_choices')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return _buildErrorWidget(snapshot.error.toString());
+        }
 
-    return ListView.builder(
-      itemCount: dummyFishOptions.length,
-      itemBuilder: (context, index) {
-        var fishOption = dummyFishOptions[index];
-        return Card(
-          elevation: 3,
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ListTile(
-            leading: CircleAvatar(
-              radius: 30,
-              // You can load the image using NetworkImage(fishOption['photo'])
-              backgroundImage: AssetImage('assets/images/${fishOption['photo']}'),
-            ),
-            title: Text(
-              fishOption['fish'],
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              '\$${fishOption['price']}',
-              style: TextStyle(fontSize: 16),
-            ),
-            // TODO: Implement onTap to show more details or perform other actions
-            onTap: () {
-              // TODO: Handle tap on fish option
-            },
-          ),
-        );
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildLoadingWidget();
+        }
+
+        final fishChoices = snapshot.data!.docs;
+
+        return _buildFishOptionsList(fishChoices);
       },
     );
   }
+
+  Widget _buildErrorWidget(String error) {
+    return Center(
+      child: Text('Error fetching fish options: $error'),
+    );
+  }
+
+  Widget _buildLoadingWidget() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildFishOptionsList(List<DocumentSnapshot> fishChoices) {
+    print('Number of fish choices: ${fishChoices.length}');
+  return ListView.builder(
+    itemCount: fishChoices.length,
+    itemBuilder: (context, index) {
+      final fishOptionData = fishChoices[index].data() as Map<String, dynamic>?;
+
+      if (fishOptionData != null) {
+        final photoUrl = fishOptionData['photoUrl'] as String?;
+        final fishName = fishOptionData['fishName'] as String?;
+        final price = fishOptionData['price'] as num?;
+
+        if (photoUrl != null && fishName != null && price != null) {
+          return Card(
+            elevation: 3,
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 30,
+                backgroundImage: NetworkImage(photoUrl),
+              ),
+              title: Text(
+                fishName,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                '\$$price',
+                style: TextStyle(fontSize: 16),
+              ),
+              // TODO: Implement onTap to show more details or perform other actions
+              onTap: () {
+                // TODO: Handle tap on fish option
+              },
+            ),
+          );
+        }
+      }
+
+      return Container(); // or any other fallback for null or incomplete data
+    },
+  );
+}
 }
