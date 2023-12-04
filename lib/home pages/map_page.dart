@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fish_cab/seller_pages/seller_profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fish_cab/home pages/bottom_navigation_bar.dart';
 import 'package:geolocator/geolocator.dart';
@@ -26,7 +27,6 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
   @override
   void initState() {
-    print("Has this been done?");
     super.initState();
     getLocation();
   }
@@ -35,8 +35,8 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   Future<Set<Marker>> getMarkersWithinRadius(LatLng center, double radius) async {
     final Set<Marker> markers = {};
 
-    // only get markers within a certain radius
-    final QuerySnapshot querySnapshot = await _firestore.collection('seller_info').get();
+    final QuerySnapshot querySnapshot =
+        await _firestore.collection('seller_info').where('loc_start_address', isNotEqualTo: 'Start Location Not Set').get();
     final Marker marker = Marker(
       markerId: MarkerId('your_marker'),
       position: center,
@@ -48,21 +48,41 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     // loop through all docs and add them to the markers set
     for (final QueryDocumentSnapshot doc in querySnapshot.docs) {
       final MarkerId markerId = MarkerId(doc.id);
-      print(doc.data());
-      final Marker marker = Marker(
-        markerId: markerId,
-        position: LatLng(
-          (doc.data() as dynamic)?['loc_start'].latitude,
-          (doc.data() as dynamic)?['loc_start'].longitude,
-        ),
-        infoWindow: InfoWindow(title: (doc.data() as dynamic)?['loc_start_address'], snippet: '*'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        onTap: () {
-          //Navigator.pushNamed(context, '/markerView',
-          //    arguments: markerId.value);
-        },
+      final latitude = (doc.data() as dynamic)?['loc_start'].latitude;
+      final longitude = (doc.data() as dynamic)?['loc_start'].longitude;
+
+      // only get markers within a certain radius
+      var _distanceInMeters = await Geolocator.distanceBetween(
+        latitude,
+        longitude,
+        center.latitude,
+        center.longitude,
       );
-      markers.add(marker);
+
+      if (_distanceInMeters > 500) {
+        continue;
+      } else {
+        final Marker marker = Marker(
+          markerId: markerId,
+          position: LatLng(
+            latitude,
+            longitude,
+          ),
+          infoWindow: InfoWindow(title: (doc.data() as dynamic)?['loc_start_address'], snippet: ''),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SellerProfileView(
+                        userId: doc.id,
+                      )),
+            );
+          },
+        );
+
+        markers.add(marker);
+      }
     }
     return markers;
   }

@@ -20,15 +20,10 @@ class SellerSetRoute extends StatefulWidget {
 }
 
 class SellerSetRouteState extends State<SellerSetRoute> {
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
-  TextEditingController _searchController = TextEditingController();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  static const CameraPosition _kInitial = CameraPosition(
-    target: LatLng(10.294676066330009, 123.88111254232928),
-    zoom: 14.4746,
-  );
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
