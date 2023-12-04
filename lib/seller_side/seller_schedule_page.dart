@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/components/my_button.dart';
@@ -5,6 +7,7 @@ import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'package:day_picker/day_picker.dart';
 
@@ -99,8 +102,17 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Schedule Page'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80.0),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 30.0, left: 10.0),
+          child: AppBar(
+            title: Text("Schedule & Route"),
+            backgroundColor: Colors.white,
+            shadowColor: Colors.transparent,
+            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+          ),
+        ),
       ),
       body: Center(
         child: Column(
@@ -124,69 +136,93 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
                 },
               ),
             ),
-            // Set Your Scheduled Time
-            MyButton(
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/seller_set_route');
-              },
-              text: 'Set Route',
-            ),
-            const SizedBox(height: 10),
-            MyButton(
-                onTap: () async {
-                  TimeRange? result = await showCupertinoDialog(
-                    barrierDismissible: true,
-                    context: context,
-                    builder: (BuildContext context) {
-                      TimeOfDay startTime = TimeOfDay.now();
-                      TimeOfDay endTime = TimeOfDay.now();
-                      return CupertinoAlertDialog(
-                        content: SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            height: 340,
-                            child: Column(
-                              children: [
-                                TimeRangePicker(
-                                  padding: 22,
-                                  hideButtons: true,
-                                  handlerRadius: 8,
-                                  strokeWidth: 4,
-                                  ticks: 12,
-                                  activeTimeTextStyle:
-                                      const TextStyle(fontWeight: FontWeight.normal, fontSize: 22, color: Colors.white),
-                                  timeTextStyle:
-                                      const TextStyle(fontWeight: FontWeight.normal, fontSize: 22, color: Colors.white70),
-                                  onStartChange: (start) {
-                                    startTime = start;
-                                  },
-                                  onEndChange: (end) {
-                                    endTime = end;
-                                  },
-                                ),
-                              ],
-                            )),
-                        actions: <Widget>[
-                          CupertinoDialogAction(
-                              isDestructiveAction: true,
-                              child: const Text('Cancel'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              }),
-                          CupertinoDialogAction(
-                            child: const Text('Ok'),
+            FutureBuilder(
+              future: _firestore.collection("seller_info").doc(_firebaseAuth.currentUser!.uid).get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          snapshot.data!['loc_start_address'],
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                        TextButton(
+                            child: const Text("Change Route",
+                                style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 16, color: Colors.blue)),
                             onPressed: () {
-                              updateTime("${startTime.hour}:${startTime.minute}", "${endTime.hour}:${endTime.minute}");
-                              Navigator.of(context).pop(
-                                TimeRange(startTime: startTime, endTime: endTime),
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    },
+                              Navigator.pushReplacementNamed(context, '/seller_set_route');
+                            }),
+                        Text(
+                          snapshot.data!['sched_end'] + ' - ' + snapshot.data!['sched_start'],
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                        TextButton(
+                          child: const Text("Change Schedule",
+                              style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 16, color: Colors.blue)),
+                          onPressed: () async {
+                            TimeRange? result = await showCupertinoDialog(
+                              barrierDismissible: true,
+                              context: context,
+                              builder: (BuildContext context) {
+                                TimeOfDay startTime = TimeOfDay.now();
+                                TimeOfDay endTime = TimeOfDay.now();
+                                return CupertinoAlertDialog(
+                                  content: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 340,
+                                      child: Column(
+                                        children: [
+                                          TimeRangePicker(
+                                            padding: 22,
+                                            hideButtons: true,
+                                            handlerRadius: 8,
+                                            strokeWidth: 4,
+                                            ticks: 12,
+                                            activeTimeTextStyle:
+                                                const TextStyle(fontWeight: FontWeight.normal, fontSize: 22, color: Colors.white),
+                                            timeTextStyle: const TextStyle(
+                                                fontWeight: FontWeight.normal, fontSize: 22, color: Colors.white70),
+                                            onStartChange: (start) {
+                                              startTime = start;
+                                            },
+                                            onEndChange: (end) {
+                                              endTime = end;
+                                            },
+                                          ),
+                                        ],
+                                      )),
+                                  actions: <Widget>[
+                                    CupertinoDialogAction(
+                                        isDestructiveAction: true,
+                                        child: const Text('Cancel'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        }),
+                                    CupertinoDialogAction(
+                                      child: const Text('Ok'),
+                                      onPressed: () {
+                                        updateTime("${startTime.hour}:${startTime.minute}", "${endTime.hour}:${endTime.minute}");
+                                        Navigator.of(context).pop(
+                                          TimeRange(startTime: startTime, endTime: endTime),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   );
-                },
-                text: "Set Time"),
+                } else {
+                  return Text('Loading...');
+                }
+              },
+            ),
           ],
         ),
       ),

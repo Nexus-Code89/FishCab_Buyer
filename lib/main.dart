@@ -13,9 +13,11 @@ import 'package:fish_cab/seller_side/seller_add_fish_option.dart';
 import 'package:fish_cab/seller_side/seller_fish_options_page.dart';
 import 'package:fish_cab/seller_side/seller_home_page.dart';
 import 'package:fish_cab/seller_side/seller_schedule_page.dart';
+import 'package:fish_cab/seller_side/seller_set_location2.dart';
 import 'package:fish_cab/seller_side/seller_set_route.dart';
 import 'package:fish_cab/seller_side/seller_singleton.dart';
 import 'package:fish_cab/seller_side/seller_schedule_page.dart';
+import 'package:fish_cab/seller_side/seller_set_location1.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -34,6 +36,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        theme: new ThemeData(scaffoldBackgroundColor: Colors.white),
         debugShowCheckedModeBanner: false,
         initialRoute: '/auth', // Set the initial route
         routes: {
@@ -66,6 +69,8 @@ class MyApp extends StatelessWidget {
           '/make_review': (context) => ReviewView(
                 reviewee: "JJc2ZatwgmPLF8clNr8mkWukqVl1",
               ),
+          '/seller_set_location1': (context) => SellerSetLocation1(),
+          '/seller_set_location2': (context) => SellerSetLocation2(),
         });
   }
 }
