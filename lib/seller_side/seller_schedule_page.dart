@@ -106,25 +106,34 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SelectWeekDays(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              days: _days,
-              border: false,
-              boxDecoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30.0),
-                color: Colors.blue,
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: SelectWeekDays(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                days: _days,
+                border: false,
+                boxDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30.0),
+                  color: Colors.blue,
+                ),
+                onSelect: (values) {
+                  // <== Callback to handle the selected days
+                  print(values);
+                  updateSchedule(values);
+                },
               ),
-              onSelect: (values) {
-                // <== Callback to handle the selected days
-                print(values);
-                updateSchedule(values);
-              },
             ),
             // Set Your Scheduled Time
-            const SizedBox(height: 50),
-            ElevatedButton(
-                onPressed: () async {
+            MyButton(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/seller_set_route');
+              },
+              text: 'Set Route',
+            ),
+            const SizedBox(height: 10),
+            MyButton(
+                onTap: () async {
                   TimeRange? result = await showCupertinoDialog(
                     barrierDismissible: true,
                     context: context,
@@ -177,7 +186,7 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
                     },
                   );
                 },
-                child: const Text("Set Time"))
+                text: "Set Time"),
           ],
         ),
       ),

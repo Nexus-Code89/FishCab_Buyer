@@ -41,6 +41,7 @@ dependencies:
   flutter_local_notifications: ^13.0.0
   time_range_picker : any
   day_picker: 2.2.0
+  google_maps_flutter: ^2.5.0
 
 
 dev_dependencies:
