@@ -2,6 +2,7 @@ import 'package:fish_cab/aunthentication%20pages/auth_page.dart';
 import 'package:fish_cab/home%20pages/chats_screen.dart';
 import 'package:fish_cab/home%20pages/home_page.dart';
 import 'package:fish_cab/home%20pages/notifications_screen.dart';
+import 'package:fish_cab/home%20pages/order_screen.dart';
 import 'package:fish_cab/home%20pages/search_screen.dart';
 import 'package:fish_cab/review-rating%20pages/make_review_screen.dart';
 import 'package:fish_cab/review-rating%20pages/view_reviews_screen.dart';
@@ -12,6 +13,7 @@ import 'package:fish_cab/seller_pages/seller_search_singleton.dart';
 import 'package:fish_cab/seller_side/seller_add_fish_option.dart';
 import 'package:fish_cab/seller_side/seller_fish_options_page.dart';
 import 'package:fish_cab/seller_side/seller_home_page.dart';
+import 'package:fish_cab/seller_side/seller_order_page.dart';
 import 'package:fish_cab/seller_side/seller_schedule_page.dart';
 import 'package:fish_cab/seller_side/seller_singleton.dart';
 import 'package:flutter/material.dart';
@@ -39,12 +41,14 @@ class MyApp extends StatelessWidget {
           '/home': (context) => HomePage(),
           '/search': (context) => SearchScreen(),
           '/chats': (context) => ChatsScreen(),
+          '/orders': (context) => OrdersScreen(),
           '/notifications': (context) => NotificationsScreen(),
           '/seller_home_view':(context) => SellerHomeScreen(userId: SellerSeacrhSingleton.instance.userId,),
           '/seller_schedule_view':(context) => SellerScheduleScreen(sellerId: SellerSeacrhSingleton.instance.userId,),
           '/seller_fish_options_view':(context) => FishOptionsScreen(sellerId: SellerSeacrhSingleton.instance.userId,),
           '/seller_home':(context) => SellerHomePage(),
           '/seller_fish_options':(context) => FishOptionsPage(sellerId: SellerSingleton.instance.userId,),
+          '/seller_orders': (context) => SellerOrderPage(),
           '/add_fish_option':(context) => AddFishOptionPage(sellerId: SellerSingleton.instance.userId,),
           '/seller_schedule': (context) => SellerSchedulePage(
                 sellerId: SellerSingleton.instance.userId,

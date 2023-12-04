@@ -67,8 +67,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                 Navigator.pushReplacementNamed(context, '/chats');
                 break;
               case 3:
-                // Navigate to NotificationsScreen
-                Navigator.pushReplacementNamed(context, '/notifications');
+                // Navigate to OrdersScreen
+                Navigator.pushReplacementNamed(context, '/orders');
                 break;
             }
           },

@@ -48,6 +48,10 @@ class FishOptionsPage extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/seller_schedule');
               break;
             // No case for 3 here
+            case 4:
+              // Navigate to Orders Page
+              Navigator.pushReplacementNamed(context, '/seller_orders');
+              break;
           }
         },
       ),

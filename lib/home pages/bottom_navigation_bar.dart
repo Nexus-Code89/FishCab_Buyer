@@ -26,8 +26,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: 'Chats',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.notifications),
-          label: 'Notifications',
+          icon: Icon(Icons.shopping_cart),
+          label: 'Order',
         ),
       ],
       selectedLabelStyle: TextStyle(color: Colors.blue),

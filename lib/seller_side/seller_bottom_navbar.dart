@@ -26,6 +26,10 @@ class SellerNavBar extends StatelessWidget {
           icon: Icon(Icons.chat), // Added chat icon
           label: 'Chat',
         ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.shopping_cart),
+          label: 'Order',
+        ),
       ],
       selectedLabelStyle: TextStyle(color: Colors.blue),
       unselectedLabelStyle: TextStyle(color: Colors.grey),

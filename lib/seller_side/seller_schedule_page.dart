@@ -198,6 +198,10 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
               // Navigate to Chats Page
               Navigator.pushReplacementNamed(context, '/chats');
               break;*/
+              case 4:
+              // Navigate to Orders Page
+              Navigator.pushReplacementNamed(context, '/seller_orders');
+              break;
           }
         },
       ),

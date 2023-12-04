@@ -35,8 +35,8 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
               Navigator.pushReplacementNamed(context, '/chats');
               break;
             case 3:
-              // Navigate to NotificationsScreen
-              Navigator.pushReplacementNamed(context, '/notifications');
+              // Navigate to OrdersScreen
+              Navigator.pushReplacementNamed(context, '/orders');
               break;
           }
         },
@@ -121,7 +121,7 @@ class _SearchViewState extends State<SearchView> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => SellerProfileView(
-                                  userId: data['id'],
+                                  userId: data.id,
                                 )),
                       );
                     },
