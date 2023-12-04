@@ -32,22 +32,29 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: '/make_review', // Set the initial route
+        initialRoute: '/auth', // Set the initial route
         routes: {
           '/auth': (context) => const AuthPage(),
           '/home': (context) => HomePage(),
           '/search': (context) => SearchScreen(),
           '/chats': (context) => ChatsScreen(),
           '/notifications': (context) => NotificationsScreen(),
-          '/seller_home': (context) => SellerHomeScreen(
-                userId: SellerSingleton.instance.userId,
+          '/seller_home_view': (context) => SellerHomeScreen(
+                userId: SellerSeacrhSingleton.instance.userId,
               ),
-          '/seller_schedule': (context) => SellerScheduleScreen(
-                sellerId: SellerSingleton.instance.userId,
+          '/seller_schedule_view': (context) => SellerScheduleScreen(
+                sellerId: SellerSeacrhSingleton.instance.userId,
               ),
-          '/seller_fish_options': (context) => FishOptionsScreen(
-                sellerId: SellerSingleton.instance.userId,
+          '/seller_fish_options_view': (context) => FishOptionsScreen(
+                sellerId: SellerSeacrhSingleton.instance.userId,
               ),
+          '/seller_home': (context) => SellerHomePage(),
+          // '/seller_fish_options': (context) => FishOptionsPage(
+          //       sellerId: SellerSingleton.instance.userId,
+          //     ),
+          // '/add_fish_option': (context) => AddFishOptionPage(
+          //       sellerId: SellerSingleton.instance.userId,
+          //     ),
           '/make_review': (context) => ReviewView(
                 reviewee: "JJc2ZatwgmPLF8clNr8mkWukqVl1",
               ),
