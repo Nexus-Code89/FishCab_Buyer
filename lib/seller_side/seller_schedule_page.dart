@@ -66,46 +66,13 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
     DayInWeek("Sun", dayKey: "Sunday"),
   ];
 
-  // // Initialize date picker with existing values
-  // List<DayInWeek> initDatePicker() {
-  //   List<DayInWeek> _days = [
-  //     DayInWeek("Mon", dayKey: "Monday"),
-  //     DayInWeek("Tue", dayKey: "Tuesday"),
-  //     DayInWeek("Wed", dayKey: "Wednesday"),
-  //     DayInWeek("Thu", dayKey: "Thursday"),
-  //     DayInWeek("Fri", dayKey: "Friday"),
-  //     DayInWeek("Sat", dayKey: "Saturday"),
-  //     DayInWeek("Sun", dayKey: "Sunday"),
-  //   ];
-
-  //   String id = _firebaseAuth.currentUser!.uid;
-  //   final seller_db = _firestore.collection("seller_info").doc(id);
-  //   List<String> seller_days = [];
-  //   seller_db.get().then(
-  //     (DocumentSnapshot doc) {
-  //       final data = doc.data() as Map<String, dynamic>;
-  //       seller_days = (data["sched_days"] as List)!.map((item) => item as String).toList();
-  //     },
-  //     onError: (e) => print("Error getting document: $e"),
-  //   );
-
-  //   for (var i = 0; i < 6; i++) {
-  //     if (seller_days.contains(_days[i].dayKey)) {
-  //       _days[i].isSelected = true;
-  //     }
-  //   }
-  //   return _days;
-  //   // add new message to db
-  //   // await seller_db.set(data, SetOptions(merge: true));
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80.0),
+        preferredSize: Size.fromHeight(70.0),
         child: Padding(
-          padding: const EdgeInsets.only(top: 30.0, left: 10.0),
+          padding: const EdgeInsets.only(top: 20.0, left: 10.0),
           child: AppBar(
             title: Text("Schedule & Route"),
             backgroundColor: Colors.white,
@@ -145,8 +112,8 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
                     child: Column(
                       children: [
                         Text(
-                          snapshot.data!['loc_start_address'],
-                          style: const TextStyle(fontSize: 18),
+                          snapshot.data!['loc_start_address'] + "  TO  " + snapshot.data!['loc_end_address'],
+                          style: const TextStyle(fontSize: 16),
                         ),
                         TextButton(
                             child: const Text("Change Route",
@@ -156,7 +123,7 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
                             }),
                         Text(
                           snapshot.data!['sched_end'] + ' - ' + snapshot.data!['sched_start'],
-                          style: const TextStyle(fontSize: 18),
+                          style: const TextStyle(fontSize: 16),
                         ),
                         TextButton(
                           child: const Text("Change Schedule",
@@ -239,10 +206,10 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
               // Navigate to Fish Options Page
               Navigator.pushReplacementNamed(context, '/seller_fish_options');
               break;
-            /*case 3:
+            case 3:
               // Navigate to Chats Page
-              Navigator.pushReplacementNamed(context, '/chats');
-              break;*/
+              Navigator.pushReplacementNamed(context, '/seller_chats');
+              break;
           }
         },
       ),

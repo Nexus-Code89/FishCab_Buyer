@@ -25,7 +25,7 @@ class SellerSetRouteState extends State<SellerSetRoute> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
+  static const CameraPosition _kInitial = CameraPosition(
     target: LatLng(10.294676066330009, 123.88111254232928),
     zoom: 14.4746,
   );
@@ -65,9 +65,10 @@ class SellerSetRouteState extends State<SellerSetRoute> {
             },
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, right: 5.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacementNamed(context, '/seller_set_location1');
@@ -76,7 +77,7 @@ class SellerSetRouteState extends State<SellerSetRoute> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 5.0, right: 25.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacementNamed(context, '/seller_set_location2');
@@ -86,18 +87,51 @@ class SellerSetRouteState extends State<SellerSetRoute> {
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Container(
-              child: GoogleMap(
-                mapType: MapType.terrain,
-                initialCameraPosition: _kGooglePlex,
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                },
-              ),
-              height: 400,
-            ),
+          FutureBuilder(
+            future: _firestore.collection("seller_info").doc(_firebaseAuth.currentUser!.uid).get(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                double latitude = snapshot.data!['loc_start'].latitude;
+                double longitude = snapshot.data!['loc_start'].longitude;
+                double latitudeEnd = snapshot.data!['loc_end'].latitude;
+                double longitudeEnd = snapshot.data!['loc_end'].longitude;
+
+                CameraPosition _kInitial = CameraPosition(
+                  target: LatLng(latitude, longitude),
+                  zoom: 14.4746,
+                );
+
+                final List<Marker> myMarker = [
+                  Marker(
+                      markerId: MarkerId('Start'),
+                      position: LatLng(latitude, longitude),
+                      infoWindow: InfoWindow(title: 'Start Location: ' + snapshot.data!['loc_start_address']),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)),
+                  Marker(
+                      markerId: MarkerId('End'),
+                      position: LatLng(latitudeEnd, longitudeEnd),
+                      infoWindow: InfoWindow(title: 'End Location: ' + snapshot.data!['loc_end_address']),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)),
+                ];
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
+                  child: Container(
+                    child: GoogleMap(
+                      mapType: MapType.terrain,
+                      initialCameraPosition: _kInitial,
+                      markers: Set<Marker>.of(myMarker),
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller.complete(controller);
+                      },
+                    ),
+                    height: 450,
+                  ),
+                );
+              } else {
+                return Text('Loading...');
+              }
+            },
           ),
         ],
       ),
@@ -114,10 +148,10 @@ class SellerSetRouteState extends State<SellerSetRoute> {
               // Navigate to Fish Options Page
               Navigator.pushReplacementNamed(context, '/seller_fish_options');
               break;
-            /*case 3:
+            case 3:
               // Navigate to Chats Page
-              Navigator.pushReplacementNamed(context, '/chats');
-              break;*/
+              Navigator.pushReplacementNamed(context, '/seller_chats');
+              break;
           }
         },
       ),

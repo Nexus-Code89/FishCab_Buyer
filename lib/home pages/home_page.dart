@@ -58,16 +58,19 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
           onTap: (index) {
             // Handle item taps here, based on the index
             switch (index) {
+              case 0:
+                Navigator.pushReplacementNamed(context, '/home');
+                break;
               case 1:
-                // Navigate to SearchScreen
                 Navigator.pushReplacementNamed(context, '/search');
                 break;
               case 2:
-                // Navigate to ChatsScreen
-                Navigator.pushReplacementNamed(context, '/chats');
+                Navigator.pushReplacementNamed(context, '/map');
                 break;
               case 3:
-                // Navigate to NotificationsScreen
+                Navigator.pushReplacementNamed(context, '/chats');
+                break;
+              case 4:
                 Navigator.pushReplacementNamed(context, '/notifications');
                 break;
             }

@@ -57,14 +57,17 @@ class SellerSetLocation2State extends State<SellerSetLocation2> {
     suggest(_searchController.text);
   }
 
-  Future<void> setLocation(double latitude, double longitude) async {
+  Future<void> setLocation(double latitude, double longitude, String location_address) async {
     final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final currentUID = _firebaseAuth.currentUser!.uid;
-    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
-    Placemark place = placemarks[0];
+    // List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+    // Placemark place = placemarks[0];
+    // print(place.name);
+
     await _firestore.collection('seller_info').doc(currentUID).set(
-        {'loc_end': new GeoPoint(latitude, longitude), 'loc_end_address': place.name}, SetOptions(merge: true)).then((value) {});
+        {'loc_end': new GeoPoint(latitude, longitude), 'loc_end_address': location_address},
+        SetOptions(merge: true)).then((value) {});
   }
 
   @override
@@ -125,7 +128,7 @@ class SellerSetLocation2State extends State<SellerSetLocation2> {
               return ListTile(
                 onTap: () async {
                   List<Location> locations = await locationFromAddress(listForPlaces[index]['description']);
-                  setLocation(locations.last.latitude, locations.last.longitude);
+                  setLocation(locations.last.latitude, locations.last.longitude, listForPlaces[index]['description']);
                   Navigator.pushReplacementNamed(context, '/seller_set_route');
                 },
                 title: Text(listForPlaces[index]['description']),

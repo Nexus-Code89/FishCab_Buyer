@@ -1,6 +1,7 @@
 import 'package:fish_cab/aunthentication%20pages/auth_page.dart';
 import 'package:fish_cab/home%20pages/chats_screen.dart';
 import 'package:fish_cab/home%20pages/home_page.dart';
+import 'package:fish_cab/home%20pages/map_page.dart';
 import 'package:fish_cab/home%20pages/notifications_screen.dart';
 import 'package:fish_cab/home%20pages/search_screen.dart';
 import 'package:fish_cab/review-rating%20pages/make_review_screen.dart';
@@ -10,6 +11,7 @@ import 'package:fish_cab/seller_pages/seller_home_screen.dart';
 import 'package:fish_cab/seller_pages/seller_schedule_screen.dart';
 import 'package:fish_cab/seller_pages/seller_search_singleton.dart';
 import 'package:fish_cab/seller_side/seller_add_fish_option.dart';
+import 'package:fish_cab/seller_side/seller_chats_screen.dart';
 import 'package:fish_cab/seller_side/seller_fish_options_page.dart';
 import 'package:fish_cab/seller_side/seller_home_page.dart';
 import 'package:fish_cab/seller_side/seller_schedule_page.dart';
@@ -43,6 +45,7 @@ class MyApp extends StatelessWidget {
           '/auth': (context) => const AuthPage(),
           '/home': (context) => HomePage(),
           '/search': (context) => SearchScreen(),
+          '/map': (context) => MapPage(),
           '/chats': (context) => ChatsScreen(),
           '/notifications': (context) => NotificationsScreen(),
           '/seller_home_view': (context) => SellerHomeScreen(
@@ -65,6 +68,7 @@ class MyApp extends StatelessWidget {
                 sellerId: SellerSingleton.instance.userId,
               ),
           '/seller_home': (context) => SellerHomePage(),
+          '/seller_chats': (context) => SellerChatsScreen(),
           '/seller_set_route': (context) => SellerSetRoute(),
           '/make_review': (context) => ReviewView(
                 reviewee: "JJc2ZatwgmPLF8clNr8mkWukqVl1",
