@@ -101,7 +101,7 @@ class ReviewController {
 
 class ReviewView extends StatefulWidget {
   late String reviewee;
-  late ReviewController controller = ReviewController(ReviewModel("sam for now", reviewee));
+  late ReviewController controller = ReviewController(ReviewModel(FirebaseAuth.instance.currentUser!.email!, reviewee));
 
   ReviewView({super.key, required this.reviewee});
 
@@ -136,6 +136,9 @@ class _ReviewViewState extends State<ReviewView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Make review"),
+      ),
       body: Center(
         child: Container(
           width: 300,
