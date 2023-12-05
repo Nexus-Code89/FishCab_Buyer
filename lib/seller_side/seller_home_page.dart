@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,8 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
   bool get wantKeepAlive => true;
 
   final User? user = FirebaseAuth.instance.currentUser;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // sign user out method
   void signUserOut(BuildContext context) {
@@ -47,11 +50,33 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
             ),
           ],
         ),
-        body: Center(
-          child: Text(
-            user != null ? "LOGGED IN AS: ${user?.email}" : "NOT LOGGED IN",
-            style: TextStyle(fontSize: 20),
-          ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            FutureBuilder(
+              future: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: Text(
+                      "Welcome, " + snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName'] + '!',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                  );
+                } else {
+                  return Text('Loading...');
+                }
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Text(
+                'To get started, set up your fish options.\n\nYou can modify your route & schedule time through the schedule tab.\n\nCommunicate with buyers through chats.',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            )
+          ],
         ),
         bottomNavigationBar: SellerNavBar(
           currentIndex: 0, // Set the default selected index
