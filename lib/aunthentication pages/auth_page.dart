@@ -11,6 +11,12 @@ class AuthPage extends StatelessWidget {
   late String token;
   AuthPage({Key? key, required this.token});
 
+  pushToken(String t, String id) async {
+    await FirebaseFirestore.instance.collection("tokens").doc(id).set({
+      "token": t
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,6 +28,7 @@ class AuthPage extends StatelessWidget {
             User? user = snapshot.data;
             String userId = user!.uid;
             print(token);
+            pushToken(token, userId);
 
             // Access the user type from Firestore
             return FutureBuilder<DocumentSnapshot>(
