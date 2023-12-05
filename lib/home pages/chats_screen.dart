@@ -24,7 +24,8 @@ class _ChatsScreenState extends State<ChatsScreen> with AutomaticKeepAliveClient
         title: Text('Chats'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('users').orderBy('firstName').snapshots(),
+          stream:
+              FirebaseFirestore.instance.collection('users').where('type', isEqualTo: 'seller').orderBy('firstName').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Something went wrong');
@@ -60,19 +61,23 @@ class _ChatsScreenState extends State<ChatsScreen> with AutomaticKeepAliveClient
             }
           }),
       bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 2,
+        currentIndex: 3, // Set the default selected index
         onTap: (index) {
+          // Handle item taps here, based on the index
           switch (index) {
             case 0:
-              // Navigate to HomeScreen
               Navigator.pushReplacementNamed(context, '/home');
               break;
             case 1:
-              // Navigate to SearchScreen
               Navigator.pushReplacementNamed(context, '/search');
               break;
+            case 2:
+              Navigator.pushReplacementNamed(context, '/map');
+              break;
             case 3:
-              // Navigate to NotificationsScreen
+              Navigator.pushReplacementNamed(context, '/chats');
+              break;
+            case 4:
               Navigator.pushReplacementNamed(context, '/notifications');
               break;
           }

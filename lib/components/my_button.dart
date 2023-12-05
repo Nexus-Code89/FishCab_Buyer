@@ -25,12 +25,7 @@ class MyButton extends StatelessWidget {
         child: Center(
           child: Text(
             text,
-            style: TextStyle(
-              color: Colors.blue,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              // TODO Change font family, add custom font files
-            ),
+            style: TextStyle(color: Colors.blue, fontSize: 16, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
           ),
         ),
       ),
