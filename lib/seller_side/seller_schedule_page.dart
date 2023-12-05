@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'package:day_picker/day_picker.dart';
 
@@ -104,6 +105,10 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
               future: _firestore.collection("seller_info").doc(_firebaseAuth.currentUser!.uid).get(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
+                  String schedStart = snapshot.data!['sched_start'];
+                  String schedEnd = snapshot.data!['sched_end'];
+                  DateTime startTime = DateFormat.Hm().parse(schedStart);
+                  DateTime endTime = DateFormat.Hm().parse(schedEnd);
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: Column(
@@ -119,7 +124,7 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
                               Navigator.pushReplacementNamed(context, '/seller_set_route');
                             }),
                         Text(
-                          snapshot.data!['sched_end'] + ' - ' + snapshot.data!['sched_start'],
+                          DateFormat("h:mma").format(startTime) + ' - ' + DateFormat("h:mma").format(endTime),
                           style: const TextStyle(fontSize: 16),
                         ),
                         TextButton(

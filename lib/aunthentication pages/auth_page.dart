@@ -38,11 +38,11 @@ class AuthPage extends StatelessWidget {
                     String userType = userData['type'] ?? ''; // Get type
                     if (userType == 'seller') {
                       // Store the userId in SellerSingleton
-                    SellerSingleton.instance.userId = userId;
+                      SellerSingleton.instance.userId = userId;
                       // User is a seller, navigate to SellerHomePage
                       return SellerHomePage();
                     } else {
-                      // User is not a seller, navigate to regular/user home page 
+                      // User is not a seller, navigate to regular/user home page
                       return HomePage();
                     }
                   }

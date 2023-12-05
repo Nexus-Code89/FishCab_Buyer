@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 class SellerScheduleScreen extends StatelessWidget {
   final String sellerId;
@@ -38,6 +39,11 @@ class SellerScheduleScreen extends StatelessWidget {
                   double latitudeEnd = snapshot.data!['loc_end'].latitude;
                   double longitudeEnd = snapshot.data!['loc_end'].longitude;
 
+                  String schedStart = snapshot.data!['sched_start'];
+                  String schedEnd = snapshot.data!['sched_end'];
+                  DateTime startTime = DateFormat.Hm().parse(schedStart);
+                  DateTime endTime = DateFormat.Hm().parse(schedEnd);
+
                   CameraPosition _kInitial = CameraPosition(
                     target: LatLng(latitude, longitude),
                     zoom: 14.4746,
@@ -69,7 +75,7 @@ class SellerScheduleScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 25.0),
                             Text(
-                              snapshot.data!['sched_end'] + ' - ' + snapshot.data!['sched_start'],
+                              DateFormat("h:mma").format(startTime) + ' - ' + DateFormat("h:mma").format(endTime),
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                             ),
                           ],
