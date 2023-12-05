@@ -38,16 +38,30 @@ class FishOptionsPage extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: SellerNavBar(
-        currentIndex: 1,
+        currentIndex: 1, // Set the default selected index
         onTap: (index) {
+          // Handle item taps here, based on the index
           switch (index) {
             case 0:
+              // Navigate to Home Page
               Navigator.pushReplacementNamed(context, '/seller_home');
               break;
+            case 1:
+              // Navigate to Fish Options Page
+              Navigator.pushReplacementNamed(context, '/seller_fish_options');
+              break;
             case 2:
+              // Navigate to Schedule Page
               Navigator.pushReplacementNamed(context, '/seller_schedule');
               break;
-            // No case for 3 here
+            case 3:
+              // Navigate to Chats Page
+              Navigator.pushReplacementNamed(context, '/seller_chats');
+              break;
+            case 4:
+              // Navigate to Orders Page
+              Navigator.pushReplacementNamed(context, '/seller_orders');
+              break;
           }
         },
       ),
@@ -63,11 +77,7 @@ class FishOptionsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('seller_info')
-          .doc(sellerId)
-          .collection('fish_choices')
-          .snapshots(),
+      stream: FirebaseFirestore.instance.collection('seller_info').doc(sellerId).collection('fish_choices').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _buildErrorWidget(snapshot.error.toString());
@@ -98,58 +108,58 @@ class FishOptionsList extends StatelessWidget {
 
   Widget _buildFishOptionsList(List<DocumentSnapshot> fishChoices) {
     print('Number of fish choices: ${fishChoices.length}');
-  return ListView.builder(
-    itemCount: fishChoices.length,
-    itemBuilder: (context, index) {
-      final fishOptionData = fishChoices[index].data() as Map<String, dynamic>?;
+    return ListView.builder(
+      itemCount: fishChoices.length,
+      itemBuilder: (context, index) {
+        final fishOptionData = fishChoices[index].data() as Map<String, dynamic>?;
 
-      if (fishOptionData != null) {
-        final photoUrl = fishOptionData['photoUrl'] as String?;
-        final fishName = fishOptionData['fishName'] as String?;
-        final price = fishOptionData['price'] as num?;
+        if (fishOptionData != null) {
+          final photoUrl = fishOptionData['photoUrl'] as String?;
+          final fishName = fishOptionData['fishName'] as String?;
+          final price = fishOptionData['price'] as num?;
 
-        return Card(
-          elevation: 3,
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ListTile(
-            leading: CircleAvatar(
-              radius: 30,
-              backgroundImage: NetworkImage(photoUrl ?? ''),
-            ),
-            title: Text(
-              fishName ?? '',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              '\$$price',
-              style: TextStyle(fontSize: 16),
-            ),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                // Call a function to delete the fish option
-                _deleteFishOption(fishChoices[index].reference);
+          return Card(
+            elevation: 3,
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 30,
+                backgroundImage: NetworkImage(photoUrl ?? ''),
+              ),
+              title: Text(
+                fishName ?? '',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                '\$$price',
+                style: TextStyle(fontSize: 16),
+              ),
+              trailing: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  // Call a function to delete the fish option
+                  _deleteFishOption(fishChoices[index].reference);
+                },
+              ),
+              onTap: () {
+                // TODO: Handle tap on fish option
               },
             ),
-            onTap: () {
-              // TODO: Handle tap on fish option
-            },
-          ),
-        );
-      }
+          );
+        }
 
-      return Container(); // or any other fallback for null or incomplete data
-    },
-  );
-}
+        return Container(); // or any other fallback for null or incomplete data
+      },
+    );
+  }
 
   // Function to delete a fish option
   Future<void> _deleteFishOption(DocumentReference fishOptionRef) async {
-      try {
-        await fishOptionRef.delete();
-        // Optionally, update the UI to reflect the deletion
-      } catch (e) {
-        print('Error deleting fish option: $e');
-      }
+    try {
+      await fishOptionRef.delete();
+      // Optionally, update the UI to reflect the deletion
+    } catch (e) {
+      print('Error deleting fish option: $e');
+    }
   }
 }

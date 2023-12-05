@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 
-class MyTextField extends StatelessWidget {
+class MyTextFieldExpanded extends StatelessWidget {
+  final Function(String)? onChanged;
   final controller;
   final String hintText;
   final bool obscureText;
 
-  const MyTextField({
+  const MyTextFieldExpanded({
     super.key,
     required this.controller,
     required this.hintText,
     required this.obscureText,
+    required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 35.0),
+    return Expanded(
       child: TextField(
+        onChanged: onChanged,
         controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
+            contentPadding: EdgeInsets.all(10),
             enabledBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Color.fromARGB(255, 232, 232, 232)),
             ),
