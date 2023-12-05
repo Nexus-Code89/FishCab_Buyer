@@ -1,4 +1,4 @@
- import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/model/fish_storage.dart';
 import 'package:flutter/material.dart';
@@ -64,22 +64,22 @@ class _AddFishOptionFormState extends State<AddFishOptionForm> {
 
   // Function to add the fish option to Firestore
   Future<void> addFishOption() async {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String sellerId = _firebaseAuth.currentUser!.uid;
-  String fishName = fishController.text;
-  String photoUrl = photoController.text;
-  double price = double.parse(priceController.text);
+    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final String sellerId = _firebaseAuth.currentUser!.uid;
+    String fishName = fishController.text;
+    String photoUrl = photoController.text;
+    double price = double.parse(priceController.text);
 
-  // Check if all fields are filled
-  if (fishName.isNotEmpty && photoUrl.isNotEmpty) {
-    // Add the fish option to Firestore
+    // Check if all fields are filled
+    if (fishName.isNotEmpty && photoUrl.isNotEmpty) {
+      // Add the fish option to Firestore
 
-  FishStorage newfish_storage= FishStorage(sellerId: sellerId, fishName: fishName, photoUrl: photoUrl, price: price);
+      FishStorage newfish_storage = FishStorage(sellerId: sellerId, fishName: fishName, photoUrl: photoUrl, price: price);
 
-  await _firestore.collection('seller_info').doc(sellerId).collection('fish_choices').add(newfish_storage.toMap());
+      await _firestore.collection('seller_info').doc(sellerId).collection('fish_choices').add(newfish_storage.toMap());
 
-    /*FirebaseFirestore.instance
+      /*FirebaseFirestore.instance
         .collection('seller_info')
         .doc(sellerId)
         .collection('fish_choices')
@@ -89,12 +89,11 @@ class _AddFishOptionFormState extends State<AddFishOptionForm> {
       'price': price,
     });*/
 
-    // Navigate back to the previous screen
-    Navigator.pop(context);
-  } else {
-    // Show an error message or handle the case where fields are not filled
-    // You can display a SnackBar or any other UI element to inform the user.
+      // Navigate back to the previous screen
+      Navigator.pop(context);
+    } else {
+      // Show an error message or handle the case where fields are not filled
+      // You can display a SnackBar or any other UI element to inform the user.
+    }
   }
-}
-
 }

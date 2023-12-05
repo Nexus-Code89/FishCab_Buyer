@@ -2,9 +2,15 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/components/my_button.dart';
+import 'package:fish_cab/components/my_textfield.dart';
+import 'package:fish_cab/components/my_textfield_expanded.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:geocoding/geocoding.dart';
 
 class SellerSetRoute extends StatefulWidget {
   const SellerSetRoute({super.key});
@@ -14,35 +20,115 @@ class SellerSetRoute extends StatefulWidget {
 }
 
 class SellerSetRouteState extends State<SellerSetRoute> {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
-
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
-
-  static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
+  TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(
-        mapType: MapType.terrain,
-        initialCameraPosition: _kGooglePlex,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70.0),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+          child: AppBar(
+            title: Text("Set Route"),
+            backgroundColor: Colors.white,
+            shadowColor: Colors.transparent,
+            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+          ),
+        ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, '/seller_schedule');
-        },
-        label: const Text('Confirm'),
-        icon: const Icon(Icons.arrow_back),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FutureBuilder(
+            future: _firestore.collection("seller_info").doc(_firebaseAuth.currentUser!.uid).get(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
+                  child: Text(
+                    snapshot.data!['loc_start_address'] + " - " + snapshot.data!['loc_end_address'],
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                );
+              } else {
+                return Text('Loading...');
+              }
+            },
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/seller_set_location1');
+                  },
+                  child: const Text('Set start location'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/seller_set_location2');
+                  },
+                  child: const Text('Set end location'),
+                ),
+              ),
+            ],
+          ),
+          FutureBuilder(
+            future: _firestore.collection("seller_info").doc(_firebaseAuth.currentUser!.uid).get(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                double latitude = snapshot.data!['loc_start'].latitude;
+                double longitude = snapshot.data!['loc_start'].longitude;
+                double latitudeEnd = snapshot.data!['loc_end'].latitude;
+                double longitudeEnd = snapshot.data!['loc_end'].longitude;
+
+                CameraPosition _kInitial = CameraPosition(
+                  target: LatLng(latitude, longitude),
+                  zoom: 14.4746,
+                );
+
+                final List<Marker> myMarker = [
+                  Marker(
+                      markerId: MarkerId('Start'),
+                      position: LatLng(latitude, longitude),
+                      infoWindow: InfoWindow(title: 'Start Location: ' + snapshot.data!['loc_start_address']),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)),
+                  Marker(
+                      markerId: MarkerId('End'),
+                      position: LatLng(latitudeEnd, longitudeEnd),
+                      infoWindow: InfoWindow(title: 'End Location: ' + snapshot.data!['loc_end_address']),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)),
+                ];
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
+                  child: Container(
+                    child: GoogleMap(
+                      mapType: MapType.terrain,
+                      initialCameraPosition: _kInitial,
+                      markers: Set<Marker>.of(myMarker),
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller.complete(controller);
+                      },
+                    ),
+                    height: 450,
+                  ),
+                );
+              } else {
+                return Text('Loading...');
+              }
+            },
+          ),
+        ],
       ),
       bottomNavigationBar: SellerNavBar(
         currentIndex: 2, // Set the default selected index
@@ -57,18 +143,13 @@ class SellerSetRouteState extends State<SellerSetRoute> {
               // Navigate to Fish Options Page
               Navigator.pushReplacementNamed(context, '/seller_fish_options');
               break;
-            /*case 3:
+            case 3:
               // Navigate to Chats Page
-              Navigator.pushReplacementNamed(context, '/chats');
-              break;*/
+              Navigator.pushReplacementNamed(context, '/seller_chats');
+              break;
           }
         },
       ),
     );
   }
-
-//   Future<void> _goToTheLake() async {
-//     final GoogleMapController controller = await _controller.future;
-//     await controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
-//   }
 }

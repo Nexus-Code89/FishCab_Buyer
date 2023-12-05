@@ -23,20 +23,24 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
       ),
       body: SearchView(), // Extracted into a separate stateful widget
       bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 1,
+        currentIndex: 1, // Set the default selected index
         onTap: (index) {
+          // Handle item taps here, based on the index
           switch (index) {
             case 0:
-              // Navigate to HomeScreen
               Navigator.pushReplacementNamed(context, '/home');
               break;
+            case 1:
+              Navigator.pushReplacementNamed(context, '/search');
+              break;
             case 2:
-              // Navigate to ChatsScreen
-              Navigator.pushReplacementNamed(context, '/chats');
+              Navigator.pushReplacementNamed(context, '/map');
               break;
             case 3:
-              // Navigate to NotificationsScreen
-              Navigator.pushReplacementNamed(context, '/notifications');
+              Navigator.pushReplacementNamed(context, '/chats');
+              break;
+            case 4:
+              Navigator.pushReplacementNamed(context, '/orders');
               break;
           }
         },
@@ -62,34 +66,32 @@ class _SearchViewState extends State<SearchView> {
         title: SizedBox(
           height: 40,
           child: TextField(
-            onChanged: (value) { // fetch string from searchbar
+            onChanged: (value) {
+              // fetch string from searchbar
               setState(() {
                 searchName = value;
               });
             },
             decoration: InputDecoration(
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                filled: true,
-                fillColor: Colors.white,
-                hintText: 'Search',
-                hintStyle: TextStyle(color: Colors.grey),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey,
-                ),
-                  focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              filled: true,
+              fillColor: Colors.white,
+              hintText: 'Search',
+              hintStyle: TextStyle(color: Colors.grey),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.grey,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
           ),
         ),
       ),
@@ -98,9 +100,7 @@ class _SearchViewState extends State<SearchView> {
               .collection('users')
               .where('type', isEqualTo: 'seller')
               .orderBy('firstName')
-              .startAt([searchName])
-              .endAt([searchName + "\uf8ff"])
-              .snapshots(),
+              .startAt([searchName]).endAt([searchName + "\uf8ff"]).snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               print('Error: ${snapshot.error}');

@@ -22,12 +22,16 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: 'Search',
         ),
         BottomNavigationBarItem(
+          icon: Icon(Icons.map),
+          label: 'Map',
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.chat),
           label: 'Chats',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.notifications),
-          label: 'Notifications',
+          icon: Icon(Icons.shopping_cart),
+          label: 'Order',
         ),
       ],
       selectedLabelStyle: TextStyle(color: Colors.blue),

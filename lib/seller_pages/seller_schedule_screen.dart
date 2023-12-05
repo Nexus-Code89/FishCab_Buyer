@@ -1,11 +1,18 @@
 import 'package:fish_cab/seller_pages/seller_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SellerScheduleScreen extends StatelessWidget {
   final String sellerId;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
   SellerScheduleScreen({required this.sellerId});
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +26,78 @@ class SellerScheduleScreen extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: Text('Welcome to the Schedule Page!'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FutureBuilder(
+              future: _firestore.collection("seller_info").doc(sellerId).get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  double latitude = snapshot.data!['loc_start'].latitude;
+                  double longitude = snapshot.data!['loc_start'].longitude;
+                  double latitudeEnd = snapshot.data!['loc_end'].latitude;
+                  double longitudeEnd = snapshot.data!['loc_end'].longitude;
+
+                  CameraPosition _kInitial = CameraPosition(
+                    target: LatLng(latitude, longitude),
+                    zoom: 14.4746,
+                  );
+
+                  final List<Marker> myMarker = [
+                    Marker(
+                        markerId: MarkerId('Start'),
+                        position: LatLng(latitude, longitude),
+                        infoWindow: InfoWindow(title: 'Start Location: ' + snapshot.data!['loc_start_address']),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)),
+                    Marker(
+                        markerId: MarkerId('End'),
+                        position: LatLng(latitudeEnd, longitudeEnd),
+                        infoWindow: InfoWindow(title: 'End Location: ' + snapshot.data!['loc_end_address']),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)),
+                  ];
+
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              snapshot.data!['loc_start_address'] + "  TO  " + snapshot.data!['loc_end_address'],
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            SizedBox(height: 25.0),
+                            Text(
+                              snapshot.data!['sched_end'] + ' - ' + snapshot.data!['sched_start'],
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(25.0),
+                        child: Container(
+                          child: GoogleMap(
+                            mapType: MapType.terrain,
+                            initialCameraPosition: _kInitial,
+                            markers: Set<Marker>.of(myMarker),
+                            onMapCreated: (GoogleMapController controller) {
+                              _controller.complete(controller);
+                            },
+                          ),
+                          height: 450,
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Text('Loading...');
+                }
+              },
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: SellerNavigationBar(
         currentIndex: 2,
