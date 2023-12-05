@@ -4,6 +4,7 @@ import 'package:fish_cab/aunthentication%20pages/login_or_register_page.dart';
 import 'package:fish_cab/seller_side/seller_home_page.dart';
 import 'package:fish_cab/seller_side/seller_singleton.dart';
 import 'package:flutter/material.dart';
+import '../api/firebase_api.dart';
 import '../home pages/home_page.dart';
 
 class AuthPage extends StatelessWidget {
@@ -19,6 +20,7 @@ class AuthPage extends StatelessWidget {
           if (snapshot.hasData) {
             User? user = snapshot.data;
             String userId = user!.uid;
+            FirebaseApi().initNotifications();
 
             // Access the user type from Firestore
             return FutureBuilder<DocumentSnapshot>(
