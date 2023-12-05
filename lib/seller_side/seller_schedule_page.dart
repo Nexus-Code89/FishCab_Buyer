@@ -33,8 +33,6 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  // Get the current sched and time
-
   // Update the scheduled days
   Future<void> updateSchedule(List<String> daysSelected) async {
     String id = _firebaseAuth.currentUser!.uid;
