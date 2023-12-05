@@ -1,3 +1,4 @@
+import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/aunthentication%20pages/auth_page.dart';
 import 'package:fish_cab/home%20pages/chats_screen.dart';
 import 'package:fish_cab/home%20pages/home_page.dart';
@@ -25,6 +26,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await FirebaseApi().initNotifications();
   runApp(const MyApp());
 }
 

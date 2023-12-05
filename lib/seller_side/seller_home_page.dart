@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
 import 'package:flutter/material.dart';
 
@@ -50,9 +52,27 @@ Widget build(BuildContext context) {
         ],
       ),
       body: Center(
-        child: Text(
-          user != null ? "LOGGED IN AS: ${user?.email}" : "NOT LOGGED IN",
-          style: TextStyle(fontSize: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              user != null ? "LOGGED IN AS: ${user?.email}" : "NOT LOGGED IN",
+              style: TextStyle(fontSize: 20),
+            ),
+            ElevatedButton(
+                onPressed: () async {
+                  QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("tokens").get();
+
+                  List<dynamic> allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+                  for (var data in allData) {
+                    FirebaseApi().sendPushMessage("Seller has started route", "Attention", data!['token']!);
+                  }
+
+
+                },
+                child: Text("Notify start route"))
+          ],
         ),
       ),
       bottomNavigationBar: SellerNavBar(
