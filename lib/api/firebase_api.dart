@@ -14,15 +14,14 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
 class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
 
-  Future<void> initNotifications() async {
+  Future<String?> initNotifications() async {
     await _firebaseMessaging.requestPermission();
-    String id = FirebaseAuth.instance.currentUser!.uid;
-    final FCMToken = await _firebaseMessaging.getToken();
-    await FirebaseFirestore.instance.collection("tokens").doc(id).set({
-      "token":FCMToken
-    });
-    print('Token $FCMToken');
+    Future <String?> FCMToken = _firebaseMessaging.getToken();
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+    return FCMToken;
+
+
+
   }
 
   void sendPushMessage(String body, String title, String token) async {

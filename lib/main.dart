@@ -27,16 +27,21 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+String? token;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  token = await FirebaseApi().initNotifications();
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   @override
@@ -46,7 +51,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: '/auth', // Set the initial route
         routes: {
-          '/auth': (context) => const AuthPage(),
+          '/auth': (context) => AuthPage(token: token!,),
           '/home': (context) => HomePage(),
           '/search': (context) => SearchScreen(),
           '/map': (context) => MapPage(),

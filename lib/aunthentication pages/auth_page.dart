@@ -8,7 +8,8 @@ import '../api/firebase_api.dart';
 import '../home pages/home_page.dart';
 
 class AuthPage extends StatelessWidget {
-  const AuthPage({Key? key});
+  late String token;
+  AuthPage({Key? key, required this.token});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class AuthPage extends StatelessWidget {
           if (snapshot.hasData) {
             User? user = snapshot.data;
             String userId = user!.uid;
-            FirebaseApi().initNotifications();
+            print(token);
 
             // Access the user type from Firestore
             return FutureBuilder<DocumentSnapshot>(
