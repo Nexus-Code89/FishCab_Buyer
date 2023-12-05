@@ -41,7 +41,13 @@ dependencies:
   flutter_local_notifications: ^13.0.0
   time_range_picker : any
   day_picker: 2.2.0
+  google_maps_flutter: ^2.5.0
+  http: ^1.1.0
+  uuid: ^4.2.1
+  geocoding: ^2.1.1
+  geolocator: ^10.1.0
 
+ 
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +75,14 @@ flutter:
   assets:
      - lib/images/
   #   - images/a_dot_ham.jpeg
+
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat-Regular.ttf
+        - asset: fonts/Montserrat-Italic.ttf
+          style: italic
+          
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

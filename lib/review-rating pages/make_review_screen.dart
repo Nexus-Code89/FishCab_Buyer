@@ -6,38 +6,31 @@ class ReviewModel {
   late String reviewer;
   late String reviewee;
 
-
   ReviewModel(this.reviewer, this.reviewee);
 
   Future<String> makeReview(String review, int starRating) async {
-    await FirebaseFirestore.instance.collection("reviews").doc(reviewee).collection("user_reviews").add(
-      {
-        'starRating': starRating,
-        'review': review,
-        'reviewedBy': reviewer
-      }
-    ).catchError((onError) {
+    await FirebaseFirestore.instance
+        .collection("reviews")
+        .doc(reviewee)
+        .collection("user_reviews")
+        .add({'starRating': starRating, 'review': review, 'reviewedBy': reviewer}).catchError((onError) {
       return onError.toString();
     });
     return "success";
-
-
   }
 
   Future<List<dynamic>> getReviews() async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("reviews").doc(reviewee).collection("user_reviews").get();
-
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection("reviews").doc(reviewee).collection("user_reviews").get();
 
     final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
 
     return allData;
   }
-
 }
 
 class ReviewController {
   late ReviewModel model;
-
 
   ReviewController(this.model);
 
@@ -50,7 +43,7 @@ class ReviewController {
       return const SnackBar(
         content: Text(
           "Successfully sent review",
-          style: TextStyle (
+          style: TextStyle(
             fontSize: 36,
             color: Colors.black,
           ),
@@ -62,7 +55,7 @@ class ReviewController {
     return SnackBar(
       content: Text(
         message,
-        style: const TextStyle (
+        style: const TextStyle(
           fontSize: 36,
           color: Colors.black,
         ),
@@ -80,20 +73,18 @@ class ReviewController {
       for (int i = 0; i < review["starRating"]; i++) {
         stars.add(const Icon(Icons.star));
       }
-      reviews.add(
-        ExpansionTile(
-            title: Row(
-              children: stars,
-            ),
-            subtitle: Text(review["reviewedBy"]),
-          children: [
-            ListTile(
-              title: const Text("Review:"),
-              subtitle: Text(review["review"]),
-            )
-          ],
-        )
-      );
+      reviews.add(ExpansionTile(
+        title: Row(
+          children: stars,
+        ),
+        subtitle: Text(review["reviewedBy"]),
+        children: [
+          ListTile(
+            title: const Text("Review:"),
+            subtitle: Text(review["review"]),
+          )
+        ],
+      ));
     }
     return reviews;
   }
@@ -101,7 +92,7 @@ class ReviewController {
 
 class ReviewView extends StatefulWidget {
   late String reviewee;
-  late ReviewController controller = ReviewController(ReviewModel("sam for now", reviewee));
+  late ReviewController controller = ReviewController(ReviewModel(FirebaseAuth.instance.currentUser!.email!, reviewee));
 
   ReviewView({super.key, required this.reviewee});
 
@@ -113,7 +104,7 @@ class _ReviewViewState extends State<ReviewView> {
   bool buttonEnabled = false;
   double currentSlideVal = 1;
   String review = "";
-  List <Icon> stars = [
+  List<Icon> stars = [
     const Icon(Icons.star),
     const Icon(Icons.star_border),
     const Icon(Icons.star_border),
@@ -130,12 +121,14 @@ class _ReviewViewState extends State<ReviewView> {
         );
       });
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Make review"),
+      ),
       body: Center(
         child: Container(
           width: 300,
@@ -146,13 +139,17 @@ class _ReviewViewState extends State<ReviewView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: stars,
               ),
-              Slider(value: currentSlideVal, onChanged: onChanged, min: 1, max: 5, divisions: 4,),
+              Slider(
+                value: currentSlideVal,
+                onChanged: onChanged,
+                min: 1,
+                max: 5,
+                divisions: 4,
+              ),
               SizedBox(
                 height: 100,
                 child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: "write review here"
-                  ),
+                  decoration: const InputDecoration(hintText: "write review here"),
                   maxLines: null,
                   expands: true,
                   keyboardType: TextInputType.multiline,
@@ -161,21 +158,21 @@ class _ReviewViewState extends State<ReviewView> {
                       buttonEnabled = !(value == "");
                       review = value;
                     });
-
                   },
                 ),
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: buttonEnabled ? () async {
-                SnackBar snackBar = await widget.controller.makeReview(review, currentSlideVal as int);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                }
-              } : null,
+                onPressed: buttonEnabled
+                    ? () async {
+                        int ratingVal = currentSlideVal.floor();
+                        SnackBar snackBar = await widget.controller.makeReview(review, ratingVal);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      }
+                    : null,
                 child: const Text("Review and Rate"),
-
-
               ),
               const SizedBox(height: 10),
               Text(buttonEnabled ? "" : "please enter a review to submit"),

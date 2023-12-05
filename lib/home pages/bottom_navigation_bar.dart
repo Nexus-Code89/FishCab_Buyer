@@ -22,6 +22,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: 'Search',
         ),
         BottomNavigationBarItem(
+          icon: Icon(Icons.map),
+          label: 'Map',
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.chat),
           label: 'Chats',
         ),

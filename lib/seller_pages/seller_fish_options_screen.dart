@@ -71,7 +71,6 @@ class _FishOptionsScreenState extends State<FishOptionsScreen> {
   }
 }
 
-
 class FishOptionsList extends StatefulWidget {
   final String sellerId;
   final ShoppingCart cart;
@@ -87,11 +86,7 @@ class _FishOptionsListState extends State<FishOptionsList> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('seller_info')
-          .doc(widget.sellerId)
-          .collection('fish_choices')
-          .snapshots(),
+      stream: FirebaseFirestore.instance.collection('seller_info').doc(widget.sellerId).collection('fish_choices').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _buildErrorWidget(snapshot.error.toString());
@@ -132,11 +127,11 @@ class _FishOptionsListState extends State<FishOptionsList> {
         final fishOptionData = fishChoices[index].data() as Map<String, dynamic>?;
 
         if (fishOptionData != null) {
-          final photoUrl = fishOptionData['photoUrl'] as String?;
+          // final photoUrl = fishOptionData['photoUrl'] as String?;
           final fishName = fishOptionData['fishName'] as String?;
           final price = fishOptionData['price'] as num?;
-
-          if (photoUrl != null && fishName != null && price != null) {
+          //photoUrl != null &&
+          if (fishName != null && price != null) {
             return Container(
               margin: EdgeInsets.symmetric(horizontal: 12),
               child: Card(
@@ -146,12 +141,12 @@ class _FishOptionsListState extends State<FishOptionsList> {
                     // Fish photo
                     Container(
                       height: 64,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(photoUrl),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                      // decoration: BoxDecoration(
+                      //   image: DecorationImage(
+                      //     image: NetworkImage(photoUrl),
+                      //     fit: BoxFit.cover,
+                      //   ),
+                      // ),
                     ),
 
                     // Fish name
@@ -191,84 +186,87 @@ class _FishOptionsListState extends State<FishOptionsList> {
   }
 
   Future<void> _showQuantityDialog(BuildContext context, String fishName, num price) async {
-  double selectedQuantity = 1.0; // Initialize with a default value
+    double selectedQuantity = 1.0; // Initialize with a default value
+    TextEditingController _quantityController = TextEditingController(text: '1.0');
 
-  return showDialog<void>(
-    context: context,
-    builder: (BuildContext context) {
-      return Center(
-        child: Container(
-          width: 300,
-          child: AlertDialog(
-            title: Text('Select Quantity'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Choose the quantity of $fishName (kg):'),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.remove),
-                      onPressed: () {
-                        if (selectedQuantity > 0.5) {
-                          // Decrease by 0.5 kilos
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: Container(
+            width: 300,
+            child: AlertDialog(
+              title: Text('Select Quantity'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Choose the quantity of $fishName (kg):'),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          if (selectedQuantity > 0.5) {
+                            // Decrease by 0.5 kilos
+                            setState(() {
+                              selectedQuantity -= 0.5;
+                              _quantityController.text = selectedQuantity.toString();
+                            });
+                          }
+                        },
+                      ),
+                      Container(
+                        width: 80,
+                        child: TextField(
+                          keyboardType: TextInputType.numberWithOptions(decimal: true),
+                          textAlign: TextAlign.center,
+                          controller: _quantityController,
+                          onChanged: (value) {
+                            // Update selectedQuantity when the user types
+                            setState(() {
+                              selectedQuantity = double.tryParse(value) ?? 0.0;
+                            });
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          // Increase by 0.5 kilos
                           setState(() {
-                            selectedQuantity -= 0.5;
-                          });
-                        }
-                      },
-                    ),
-                    Container(
-                      width: 80,
-                      child: TextField(
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        textAlign: TextAlign.center,
-                        controller: TextEditingController(text: selectedQuantity.toString()),
-                        onChanged: (value) {
-                          // Update selectedQuantity when the user types
-                          setState(() {
-                            selectedQuantity = double.tryParse(value) ?? 0.0;
+                            selectedQuantity += 0.5;
+                            _quantityController.text = selectedQuantity.toString();
                           });
                         },
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed: () {
-                        // Increase by 0.5 kilos
-                        setState(() {
-                          selectedQuantity += 0.5;
-                        });
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Cancel button
+                  },
+                  child: Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Confirm button
+                    // Add the selected quantity to the cart
+                    CartItem newItem = CartItem(name: fishName, price: price, quantity: selectedQuantity);
+                    widget.cart.addItem(newItem);
+                    Navigator.pop(context); // Close the dialog
+                  },
+                  child: Text('Confirm'),
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Cancel button
-                },
-                child: Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  // Confirm button
-                  // Add the selected quantity to the cart
-                  CartItem newItem = CartItem(name: fishName, price: price, quantity: selectedQuantity);
-                  widget.cart.addItem(newItem);
-                  Navigator.pop(context); // Close the dialog
-                },
-                child: Text('Confirm'),
-              ),
-            ],
           ),
-        ),
-      );
-    },
-  );
- }
+        );
+      },
+    );
+  }
 }

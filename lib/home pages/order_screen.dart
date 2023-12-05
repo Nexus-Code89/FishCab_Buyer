@@ -77,8 +77,8 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
           );
         },
       ),
-        bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 3,
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: 4,
         onTap: (index) {
           // Handle navigation taps based on the index
           switch (index) {
@@ -89,7 +89,13 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
               Navigator.pushReplacementNamed(context, '/search');
               break;
             case 2:
+              Navigator.pushReplacementNamed(context, '/map');
+              break;
+            case 3:
               Navigator.pushReplacementNamed(context, '/chats');
+              break;
+            case 4:
+              Navigator.pushReplacementNamed(context, '/orders');
               break;
           }
         },
@@ -114,106 +120,101 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
   }
 
   void showOrderDetails(QueryDocumentSnapshot order, String sellerName) {
-  List<dynamic> items = order['items'];
+    List<dynamic> items = order['items'];
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Order Details'),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Seller: $sellerName', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 16.0),
-            Text('Order Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            SizedBox(height: 8.0),
-            for (var item in items)
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Order Details'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Seller: $sellerName', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 16.0),
+              Text('Order Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8.0),
+              for (var item in items)
+                ListTile(
+                  title: Text(
+                    '${item['name']}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Price: \₱${item['price']} per kg'),
+                      Text('Quantity: ${item['quantity']} kg'),
+                      Text(
+                        'Total: \₱${(item['price'] * item['quantity']).toStringAsFixed(2)}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  contentPadding: EdgeInsets.all(0),
+                ),
+              SizedBox(height: 16.0),
+              Divider(thickness: 1),
               ListTile(
                 title: Text(
-                  '${item['name']}',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  'Total Price: \₱${order['totalPrice']}',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Price: \₱${item['price']} per kg'),
-                    Text('Quantity: ${item['quantity']} kg'),
-                    Text(
-                      'Total: \₱${(item['price'] * item['quantity']).toStringAsFixed(2)}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                contentPadding: EdgeInsets.all(0),
               ),
-            SizedBox(height: 16.0),
-            Divider(thickness: 1),
-            ListTile(
-              title: Text(
-                'Total Price: \₱${order['totalPrice']}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                // "Received" button press
+                markOrderAsReceived(order.id);
+                Navigator.pop(context);
+              },
+              child: Text('Received'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Handle "Rate" button press
+                // TODO: navigate to a rating screen or show a dialog for rating
+                Navigator.pop(context);
+              },
+              child: Text('Rate'),
             ),
           ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              // "Received" button press
-              markOrderAsReceived(order.id);
-              Navigator.pop(context);
-            },
-            child: Text('Received'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Handle "Rate" button press
-              // TODO: navigate to a rating screen or show a dialog for rating
-              Navigator.pop(context);
-            },
-            child: Text('Rate'),
-          ),
-        ],
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
-void markOrderAsReceived(String orderId) {
-  FirebaseFirestore.instance
-      .collection('orders')
-      .doc(orderId)
-      .update({'status': 'received'})
-      .then((value) {
-        // Order marked as received successfully
-        print('Order marked as received!');
-        showReceivedDialog();
-      })
-      .catchError((error) {
-        // Handle errors, e.g., show an error message
-        print('Error marking order as received: $error');
-      });
-}
+  void markOrderAsReceived(String orderId) {
+    FirebaseFirestore.instance.collection('orders').doc(orderId).update({'status': 'received'}).then((value) {
+      // Order marked as received successfully
+      print('Order marked as received!');
+      showReceivedDialog();
+    }).catchError((error) {
+      // Handle errors, e.g., show an error message
+      print('Error marking order as received: $error');
+    });
+  }
 
-void showReceivedDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Order Received'),
-        content: Text('The order has been received.'),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Close the dialog
-            },
-            child: Text('OK'),
-          ),
-        ],
-      );
-    },
-  );
- }
+  void showReceivedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Order Received'),
+          content: Text('The order has been received.'),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

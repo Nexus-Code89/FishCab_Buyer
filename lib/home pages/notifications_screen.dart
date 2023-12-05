@@ -21,20 +21,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> with Automati
         child: Text('You are on the Notifications Screen!'),
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 3,
+        currentIndex: 4, // Set the default selected index
         onTap: (index) {
+          // Handle item taps here, based on the index
           switch (index) {
             case 0:
-              // Navigate to HomeScreen
               Navigator.pushReplacementNamed(context, '/home');
               break;
             case 1:
-              // Navigate to SearchScreen
               Navigator.pushReplacementNamed(context, '/search');
               break;
             case 2:
-              // Navigate to ChatsScreen
+              Navigator.pushReplacementNamed(context, '/map');
+              break;
+            case 3:
               Navigator.pushReplacementNamed(context, '/chats');
+              break;
+            case 4:
+              Navigator.pushReplacementNamed(context, '/orders');
               break;
           }
         },
@@ -42,5 +46,3 @@ class _NotificationsScreenState extends State<NotificationsScreen> with Automati
     );
   }
 }
-
-
