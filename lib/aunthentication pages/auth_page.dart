@@ -13,7 +13,7 @@ class AuthPage extends StatelessWidget {
 
   pushToken(String t, String id) async {
     await FirebaseFirestore.instance.collection("tokens").doc(id).set({
-      "token": t
+      "token": t,
     });
   }
 

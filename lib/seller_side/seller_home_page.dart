@@ -47,7 +47,7 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
           actions: [
             IconButton(
               onPressed: () => signUserOut(context), // Pass the context to the function
-              icon: Icon(Icons.logout),
+              icon: const Icon(Icons.logout),
             ),
           ],
         ),
@@ -61,33 +61,51 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
                   return Padding(
                     padding: const EdgeInsets.all(25.0),
                     child: Text(
-                      "Welcome, " + snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName'] + '!',
+                      '${"Welcome, " + snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName']}!',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   );
                 } else {
-                  return Text('Loading...');
+                  return const Text('Loading...');
                 }
               },
             ),
-            Padding(
-              padding: const EdgeInsets.all(25.0),
+            // placeholder text
+            const Padding(
+              padding: EdgeInsets.all(25.0),
               child: Text(
                 'To get started, set up your fish options.\n\nYou can modify your route & schedule time through the schedule tab.\n\nCommunicate with buyers through chats.',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
+
+            // start route button
             ElevatedButton(
                 onPressed: () async {
-                  QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("tokens").get();
+                  QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
+                      .collection("orders")
+                      .where("sellerID", isEqualTo: user?.uid)
+                      .where("isConfirmed", isEqualTo: "unconfirmed")
+                      .get();
 
-                  List<dynamic> allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+                  List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+                  List<String> buyers = [];
+                  print(buyersData.length.toString());
+                  
+                  for (var data in buyersData) {
+                    buyers.add(data["userID"]);
+                  }
+
+                  QuerySnapshot querySnapshot_Tokens =
+                      await FirebaseFirestore.instance.collection("tokens").where(FieldPath.documentId, whereIn: buyers).get();
+
+                  List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
 
                   for (var data in allData) {
                     FirebaseApi().sendPushMessage("Seller has started route", "Attention", data!['token']!);
                   }
                 },
-                child: Text("Notify start route"))
+                child: const Text("Notify start route"))
           ],
         ),
         bottomNavigationBar: SellerNavBar(
