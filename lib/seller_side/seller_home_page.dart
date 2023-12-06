@@ -90,8 +90,7 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
 
                   List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
                   List<String> buyers = [];
-                  print(buyersData.length.toString());
-                  
+
                   for (var data in buyersData) {
                     buyers.add(data["userID"]);
                   }
@@ -101,8 +100,14 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
 
                   List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
 
+                  DocumentSnapshot currentUserDataSnapshot =
+                      await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
+
                   for (var data in allData) {
-                    FirebaseApi().sendPushMessage("Seller has started route", "Attention", data!['token']!);
+                    FirebaseApi().sendPushMessage(
+                        "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
+                        "Fresh fish is on its way!",
+                        data!['token']!);
                   }
                 },
                 child: const Text("Notify start route"))
