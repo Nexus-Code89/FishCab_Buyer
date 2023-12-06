@@ -177,7 +177,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               Navigator.pushReplacementNamed(context, '/chats');
               break;
             case 4:
-              Navigator.pushReplacementNamed(context, '/notifications');
+              Navigator.pushReplacementNamed(context, '/orders');
               break;
           }
         },
