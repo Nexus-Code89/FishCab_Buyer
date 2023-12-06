@@ -117,61 +117,83 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
     return itemNames.join(', ');
   }
 
-  void showOrderDetails(QueryDocumentSnapshot order, String buyerName) {
+void showOrderDetails(QueryDocumentSnapshot order, String buyerName) {
   List<dynamic> items = order['items'];
+
+  // Define colors based on order status
+  Color statusColor = order['status'] == 'received' ? Colors.green : Colors.yellow;
 
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Order Details'),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Buyer: $buyerName', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 16.0),
-            Text('Order Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            SizedBox(height: 8.0),
-            for (var item in items)
-              ListTile(
-                title: Text(
-                  '${item['name']}',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Price: \₱${item['price']} per kg'),
-                    Text('Quantity: ${item['quantity']} kg'),
-                    Text(
-                      'Total: \₱${(item['price'] * item['quantity']).toStringAsFixed(2)}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text('Order Details', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        content: Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Buyer: $buyerName', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                SizedBox(height: 16.0),
+                Text('Order Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                SizedBox(height: 8.0),
+                for (var item in items)
+                  ListTile(
+                    title: Text(
+                      '${item['name']}',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                  ],
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Price: \₱${item['price']} per kg'),
+                        Text('Quantity: ${item['quantity']} kg'),
+                        Text(
+                          'Total: \₱${(item['price'] * item['quantity']).toStringAsFixed(2)}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    contentPadding: EdgeInsets.all(0),
+                  ),
+                SizedBox(height: 16.0),
+                Divider(thickness: 1),
+                ListTile(
+                  title: Text(
+                    'Total Price: \₱${order['totalPrice']}',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ),
-                contentPadding: EdgeInsets.all(0),
-              ),
-            SizedBox(height: 16.0),
-            Divider(thickness: 1),
-            ListTile(
-              title: Text(
-                'Total Price: \₱${order['totalPrice']}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+                SizedBox(height: 16.0),
+                ListTile(
+                  title: Row(
+                    children: [
+                      Text(
+                        'Status: ',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                      ),
+                      Text(
+                        '${order['status']}',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: statusColor),
+                      ),
+                      SizedBox(width: 16.0), // Add space between status and Confirm button
+                      ElevatedButton(
+                        onPressed: () {
+                          //"Confirm" button press
+                          confirmOrder(order.id);
+                          Navigator.pop(context);
+                        },
+                        child: Text('Confirm'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              //"Confirm" button press
-              confirmOrder(order.id);
-              Navigator.pop(context);
-            },
-            child: Text('Confirm'),
           ),
-        ],
+        ),
       );
     },
   );

@@ -3,13 +3,18 @@ import 'package:fish_cab/model/order.dart';
 import 'package:fish_cab/model/shopping_cart.dart';
 import 'package:flutter/material.dart';
 
-class CartPage extends StatelessWidget {
+class CartPage extends StatefulWidget {
   final ShoppingCart cart;
   final sellerID;
   final userID;
   
   const CartPage({Key? key, required this.cart, required this.sellerID, required this.userID}) : super(key: key);
 
+  @override
+  State<CartPage> createState() => _CartPageState();
+}
+
+class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,9 +27,9 @@ class CartPage extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: cart.items.length,
+              itemCount: widget.cart.items.length,
               itemBuilder: (context, index) {
-                CartItem item = cart.items[index];
+                CartItem item = widget.cart.items[index];
                 double totalPerItem = item.price * item.quantity;
 
                 return Card(
@@ -48,6 +53,12 @@ class CartPage extends StatelessWidget {
                         Text('Total: \₱${totalPerItem.toStringAsFixed(2)}'),
                       ],
                     ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        // Show confirmation dialog before deleting
+                        showDeleteConfirmationDialog(context, index);
+                      },)
                   ),
                 );
               },
@@ -61,13 +72,16 @@ class CartPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total: \₱${cart.getTotalPrice().toStringAsFixed(2)}',
+                    'Total: \₱${widget.cart.getTotalPrice().toStringAsFixed(2)}',
                     style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      placeOrder(context, cart, sellerID, userID);
-                      // Optionally, navigate to a success page or show a confirmation message
+                      if (widget.cart != null && widget.cart.items.isNotEmpty) {
+                        placeOrder(context, widget.cart, widget.sellerID, widget.userID);
+                      } else {
+                         showEmptyCartPrompt(context);
+                      }
                     },
                     child: Text('Place Order'),
                   )
@@ -80,62 +94,129 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  // Placeholder method for placing an order
-void placeOrder(BuildContext context, ShoppingCart cart, String sellerID, String userID) {
-  Orders order = Orders(
-    documentID: '$sellerID$userID',
-    sellerID: sellerID,
-    userID: userID,
-    status: 'pending', 
-    isConfirmed: 'unconfirmed', 
-    items: cart.items,
-    totalPrice: cart.getTotalPrice(),
-    timestamp: Timestamp.now(),
+void showEmptyCartPrompt(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Empty Cart'),
+        content: Text('Your cart is empty. Add items before placing an order.'),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+            },
+            child: Text('OK'),
+          ),
+        ],
+      );
+    },
   );
+}
 
-  // Add the order to Firebase
-  FirebaseFirestore.instance
-      .collection('orders')
-      .doc(order.documentID)
-      .set({
-        'sellerID': order.sellerID,
-        'userID': order.userID,
-        'status': order.status,
-        'isConfirmed': order.isConfirmed,
-        'items': order.items.map((item) => {
-          'name': item.name,
-          'quantity': item.quantity,
-          'price': item.price,
-        }).toList(),
-        'totalPrice': order.totalPrice,
-        'timestamp': order.timestamp,
-      })
-      .then((value) {
-        // Order placed successfully, we can add additional logic here
-        // For example, clear the cart or show a success message
-      })
-      .catchError((error) {
-        // Handle errors, e.g., show an error message
-        //print('Error placing order: $error');
-      });
-      showDialog(
+void showDeleteConfirmationDialog(BuildContext context, int index) {
+    showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Order Placed'),
-          content: Text('Thank you for your order!'),
+          title: Text('Delete Item'),
+          content: Text('Are you sure you want to delete this item from the cart?'),
           actions: [
-            TextButton(
+            ElevatedButton(
               onPressed: () {
-                Navigator.pop(context); // Close the current dialog
-                Navigator.pop(context); // Close the CartPage
-                Navigator.pushReplacementNamed(context, '/orders'); // Navigate to OrdersScreen
+                // Delete the item from the cart
+                Navigator.pop(context); // Close the confirmation dialog
+                deleteCartItem(context, index);
               },
-              child: Text('OK'),
+              child: Text('Yes'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the confirmation dialog
+              },
+              child: Text('No'),
             ),
           ],
         );
       },
     );
   }
+
+  void deleteCartItem(BuildContext context, int index) {
+    // Call the removeItem method on your ShoppingCart instance
+    widget.cart.removeItem(index);
+
+    // Update the UI (optional)
+    setState(() {
+    // Additional logic to update state variables if needed
+    });
+
+    // Optionally, show a message to indicate that the item has been deleted
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Item removed from the cart.'),
+      ),
+    );
+  }
+
+    // Placeholder method for placing an order
+  void placeOrder(BuildContext context, ShoppingCart cart, String sellerID, String userID) {
+    String orderID = UniqueKey().toString();
+
+    Orders order = Orders(
+      documentID: orderID,
+      sellerID: sellerID,
+      userID: userID,
+      status: 'pending', 
+      isConfirmed: 'unconfirmed', 
+      items: cart.items,
+      totalPrice: cart.getTotalPrice(),
+      timestamp: Timestamp.now(),
+    );
+
+    // Add the order to Firebase
+    FirebaseFirestore.instance
+        .collection('orders')
+        .doc(order.documentID)
+        .set({
+          'sellerID': order.sellerID,
+          'userID': order.userID,
+          'status': order.status,
+          'isConfirmed': order.isConfirmed,
+          'items': order.items.map((item) => {
+            'name': item.name,
+            'quantity': item.quantity,
+            'price': item.price,
+          }).toList(),
+          'totalPrice': order.totalPrice,
+          'timestamp': order.timestamp,
+        })
+        .then((value) {
+          // Order placed successfully, we can add additional logic here
+          // For example, clear the cart or show a success message
+        })
+        .catchError((error) {
+          // Handle errors, e.g., show an error message
+          //print('Error placing order: $error');
+        });
+        showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Order Placed'),
+            content: Text('Thank you for your order!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the current dialog
+                  Navigator.pop(context); // Close the CartPage
+                  Navigator.pushReplacementNamed(context, '/orders'); // Navigate to OrdersScreen
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
 }
