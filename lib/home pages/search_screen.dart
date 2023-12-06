@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fish_cab/seller_pages/seller_profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fish_cab/home%20pages/bottom_navigation_bar.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -59,6 +61,21 @@ class SearchView extends StatefulWidget {
 class _SearchViewState extends State<SearchView> {
   var searchName = "";
   bool isSellerSelected = true;
+  bool isNearbySelected = false;
+  LatLng? _currentPosition;
+  LatLng basePosition = LatLng(10.30943566786076, 123.88635816441766);
+  bool _isLoading = true;
+  List<String> userList = [];
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    getLocation().then((value) {
+      getUsersWithinRadius(_currentPosition!, 500).then((value) {});
+    });
+  }
 
   // Function to fetch and display seller data
   Widget buildSellerListView() {
@@ -67,8 +84,7 @@ class _SearchViewState extends State<SearchView> {
           .collection('users')
           .where('type', isEqualTo: 'seller')
           .orderBy('firstName')
-          .startAt([searchName.toUpperCase()])
-          .endAt([searchName + "\uf8ff"]).snapshots(),
+          .startAt([searchName.toUpperCase()]).endAt([searchName + "\uf8ff"]).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong');
@@ -105,14 +121,14 @@ class _SearchViewState extends State<SearchView> {
       },
     );
   }
-  
+
   Future<String> getSellerName(String sellerID) async {
     var userDoc = await FirebaseFirestore.instance.collection('users').doc(sellerID).get();
     var firstName = userDoc['firstName'];
     var lastName = userDoc['lastName'];
     return '$firstName $lastName';
   }
-  
+
   // Function to fetch and display fish data
   Widget buildFishListView() {
     return FutureBuilder<QuerySnapshot>(
@@ -142,16 +158,13 @@ class _SearchViewState extends State<SearchView> {
                   .doc(sellerInfoDocId)
                   .collection('fish_choices')
                   .orderBy('fishName')
-                  .startAt([searchName.toUpperCase()])
-                  .endAt([searchName + "\uf8ff"])
-                  .snapshots(),
+                  .startAt([searchName.toUpperCase()]).endAt([searchName + "\uf8ff"]).snapshots(),
               builder: (context, fishChoicesSnapshot) {
                 if (fishChoicesSnapshot.hasError) {
                   return Text('Error loading fish choices');
                 }
 
-                if (fishChoicesSnapshot.connectionState ==
-                    ConnectionState.waiting) {
+                if (fishChoicesSnapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 }
 
@@ -209,11 +222,100 @@ class _SearchViewState extends State<SearchView> {
     );
   }
 
+  // get current location of device
+  getLocation() async {
+    LocationPermission permission;
+    permission = await Geolocator.requestPermission();
+
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    double lat = position.latitude;
+    double long = position.longitude;
+    LatLng location = LatLng(lat, long);
+
+    setState(() {
+      _currentPosition = location;
+      _isLoading = false;
+    });
+  }
+
+// get all users within a certain radius
+  getUsersWithinRadius(LatLng center, double radius) async {
+    final QuerySnapshot querySnapshot =
+        await _firestore.collection('seller_info').where('loc_start_address', isNotEqualTo: 'Start Location Not Set').get();
+
+    // loop through all docs and add them to the users set
+    for (final QueryDocumentSnapshot doc in querySnapshot.docs) {
+      final String userId = doc.id;
+      final latitude = (doc.data() as dynamic)?['loc_start'].latitude;
+      final longitude = (doc.data() as dynamic)?['loc_start'].longitude;
+
+      // only get users within a certain radius
+      var _distanceInMeters = await Geolocator.distanceBetween(
+        latitude,
+        longitude,
+        center.latitude,
+        center.longitude,
+      );
+
+      if (_distanceInMeters > 500) {
+        continue;
+      } else {
+        userList.add(userId);
+      }
+    }
+  }
+
+  // Function to fetch and display nearby date
+  Widget buildNearbyListView() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .where('type', isEqualTo: 'seller')
+          .orderBy('firstName')
+          .startAt([searchName.toUpperCase()]).endAt([searchName + "\uf8ff"]).snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Text("Loading");
+        }
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            var data = snapshot.data!.docs[index];
+            if (userList.contains(data.id)) {
+              return ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SellerProfileView(
+                        userId: data.id,
+                      ),
+                    ),
+                  );
+                },
+                leading: CircleAvatar(
+                  radius: 24,
+                  //backgroundImage: NetworkImage(data['profileUrl']),
+                ),
+                title: Text(data['firstName']),
+                subtitle: Text(data['email']),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 150,
+        toolbarHeight: 120,
         backgroundColor: Colors.white,
         title: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -228,39 +330,31 @@ class _SearchViewState extends State<SearchView> {
                   });
                 },
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintText: 'Search',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                    contentPadding: EdgeInsets.all(10),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Color.fromARGB(255, 232, 232, 232)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400),
+                    ),
+                    fillColor: Colors.grey.shade100,
+                    filled: true,
+                    hintText: 'Search for something...',
+                    hintStyle: TextStyle(color: Colors.grey[500], fontFamily: 'Montserrat', fontWeight: FontWeight.bold)),
               ),
-              SizedBox(height: 16),
 
-              // Two buttons side by side
+              const SizedBox(height: 5),
+
+              // row of buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  // seller button
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
                         isSellerSelected = true;
+                        isNearbySelected = false;
                       });
                     },
                     style: ButtonStyle(
@@ -276,7 +370,7 @@ class _SearchViewState extends State<SearchView> {
                         },
                       ),
                       padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        EdgeInsets.symmetric(horizontal: 24, vertical: 5),
                       ),
                     ),
                     child: Text(
@@ -284,16 +378,18 @@ class _SearchViewState extends State<SearchView> {
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
+                  // fish button
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
                         isSellerSelected = false;
+                        isNearbySelected = false;
                       });
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.pressed) || !isSellerSelected) {
+                          if (states.contains(MaterialState.pressed) || (!isSellerSelected && !isNearbySelected)) {
                             // Sellected
                             return Colors.blue;
                           } else {
@@ -303,11 +399,40 @@ class _SearchViewState extends State<SearchView> {
                         },
                       ),
                       padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        EdgeInsets.symmetric(horizontal: 24, vertical: 5),
                       ),
                     ),
                     child: Text(
                       'Fish',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  // nearby button
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isSellerSelected = false;
+                        isNearbySelected = true;
+                      });
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed) || isNearbySelected) {
+                            // Sellected
+                            return Colors.blue;
+                          } else {
+                            // Not Selected
+                            return Colors.grey;
+                          }
+                        },
+                      ),
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 24, vertical: 5),
+                      ),
+                    ),
+                    child: Text(
+                      'Nearby',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -317,7 +442,11 @@ class _SearchViewState extends State<SearchView> {
           ),
         ),
       ),
-      body: isSellerSelected ? buildSellerListView() : buildFishListView(),
+      body: (isSellerSelected)
+          ? buildSellerListView()
+          : (isNearbySelected)
+              ? buildNearbyListView()
+              : buildFishListView(),
     );
   }
 }

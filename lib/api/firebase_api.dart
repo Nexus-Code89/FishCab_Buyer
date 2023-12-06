@@ -16,12 +16,9 @@ class FirebaseApi {
 
   Future<String?> initNotifications() async {
     await _firebaseMessaging.requestPermission();
-    Future <String?> FCMToken = _firebaseMessaging.getToken();
+    Future<String?> FCMToken = _firebaseMessaging.getToken();
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
     return FCMToken;
-
-
-
   }
 
   void sendPushMessage(String body, String title, String token) async {
@@ -31,7 +28,7 @@ class FirebaseApi {
         headers: <String, String>{
           'Content-Type': 'application/json',
           'Authorization':
-          'key=AAAA0t4TDS0:APA91bH2R9XarRRw_e1-UYYnmFvX1FrFGBc7AWAT6u5MVJH5V2NIn5LmoFb70h2UqmW5oluK4A_63xsZV3t74U5KDCNd-WlhAe1kLgUukUjwWg8FgTzKGF6AnbuHpfW_6hKJJB-nw0Nb',
+              'key=AAAA0t4TDS0:APA91bH2R9XarRRw_e1-UYYnmFvX1FrFGBc7AWAT6u5MVJH5V2NIn5LmoFb70h2UqmW5oluK4A_63xsZV3t74U5KDCNd-WlhAe1kLgUukUjwWg8FgTzKGF6AnbuHpfW_6hKJJB-nw0Nb',
         },
         body: jsonEncode(
           <String, dynamic>{
@@ -40,11 +37,7 @@ class FirebaseApi {
               'title': title,
             },
             'priority': 'high',
-            'data': <String, dynamic>{
-              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-              'id': '1',
-              'status': 'done'
-            },
+            'data': <String, dynamic>{'click_action': 'FLUTTER_NOTIFICATION_CLICK', 'id': '1', 'status': 'done'},
             "to": token,
           },
         ),
@@ -54,6 +47,4 @@ class FirebaseApi {
       print("error push notification");
     }
   }
-
-
 }
