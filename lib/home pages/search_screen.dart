@@ -58,82 +58,266 @@ class SearchView extends StatefulWidget {
 
 class _SearchViewState extends State<SearchView> {
   var searchName = "";
+  bool isSellerSelected = true;
+
+  // Function to fetch and display seller data
+  Widget buildSellerListView() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .where('type', isEqualTo: 'seller')
+          .orderBy('firstName')
+          .startAt([searchName.toUpperCase()])
+          .endAt([searchName + "\uf8ff"]).snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Text("Loading");
+        }
+
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            var data = snapshot.data!.docs[index];
+            return ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SellerProfileView(
+                      userId: data.id,
+                    ),
+                  ),
+                );
+              },
+              leading: CircleAvatar(
+                radius: 24,
+                //backgroundImage: NetworkImage(data['profileUrl']),
+              ),
+              title: Text(data['firstName']),
+              subtitle: Text(data['email']),
+            );
+          },
+        );
+      },
+    );
+  }
+  
+  // Function to fetch and display fish data
+  Future<String> getSellerName(String sellerID) async {
+    var userDoc = await FirebaseFirestore.instance.collection('users').doc(sellerID).get();
+    var firstName = userDoc['firstName'];
+    var lastName = userDoc['lastName'];
+    return '$firstName $lastName';
+  }
+
+  Widget buildFishListView() {
+    return FutureBuilder<QuerySnapshot>(
+      future: FirebaseFirestore.instance.collection('seller_info').get(),
+      builder: (context, sellerInfoSnapshot) {
+        if (sellerInfoSnapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
+
+        if (sellerInfoSnapshot.hasError) {
+          return Text('Error loading seller info');
+        }
+
+        // Extract all seller_info documents
+        var sellerInfoDocs = sellerInfoSnapshot.data!.docs;
+
+        return ListView.builder(
+          itemCount: sellerInfoDocs.length,
+          itemBuilder: (context, index) {
+            var sellerInfoDoc = sellerInfoDocs[index];
+            var sellerInfoDocId = sellerInfoDoc.id;
+
+            // Use a StreamBuilder to listen to the fish_choices subcollection
+            return StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('seller_info')
+                  .doc(sellerInfoDocId)
+                  .collection('fish_choices')
+                  .orderBy('fishName')
+                  .startAt([searchName.toUpperCase()])
+                  .endAt([searchName + "\uf8ff"])
+                  .snapshots(),
+              builder: (context, fishChoicesSnapshot) {
+                if (fishChoicesSnapshot.hasError) {
+                  return Text('Error loading fish choices');
+                }
+
+                if (fishChoicesSnapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                }
+
+                // Extract all fish choices for the current seller
+                var fishChoicesDocs = fishChoicesSnapshot.data!.docs;
+
+                return FutureBuilder<String>(
+                  future: getSellerName(sellerInfoDocId),
+                  builder: (context, sellerNameSnapshot) {
+                    if (sellerNameSnapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+
+                    if (sellerNameSnapshot.hasError) {
+                      return Text('Error loading seller name');
+                    }
+
+                    var sellerName = sellerNameSnapshot.data;
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: fishChoicesDocs.length,
+                      itemBuilder: (context, index) {
+                        var fishData = fishChoicesDocs[index];
+
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SellerProfileView(
+                                  userId: sellerInfoDocId,
+                                ),
+                              ),
+                            );
+                          },
+                          leading: CircleAvatar(
+                            radius: 24,
+                            // Replace with the logic to load fish images
+                            // backgroundImage: NetworkImage(fishData['photoUrl']),
+                          ),
+                          title: Text(fishData['fishName']),
+                          subtitle: Text('Seller: $sellerName | Price: \$${fishData['price']}'),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 150,
         backgroundColor: Colors.white,
-        title: SizedBox(
-          height: 40,
-          child: TextField(
-            onChanged: (value) {
-              // fetch string from searchbar
-              setState(() {
-                searchName = value;
-              });
-            },
-            decoration: InputDecoration(
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-              filled: true,
-              fillColor: Colors.white,
-              hintText: 'Search',
-              hintStyle: TextStyle(color: Colors.grey),
-              prefixIcon: Icon(
-                Icons.search,
-                color: Colors.grey,
+        title: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Search bar
+              TextField(
+                onChanged: (value) {
+                  setState(() {
+                    searchName = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintText: 'Search',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.grey,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                borderRadius: BorderRadius.circular(8),
+              SizedBox(height: 16),
+
+              // Two buttons side by side
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isSellerSelected = true;
+                      });
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed) || isSellerSelected) {
+                            // Selected
+                            return Colors.blue;
+                          } else {
+                            // Not Selected
+                            return Colors.grey;
+                          }
+                        },
+                      ),
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      ),
+                    ),
+                    child: Text(
+                      'Seller',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isSellerSelected = false;
+                      });
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed) || !isSellerSelected) {
+                            // Sellected
+                            return Colors.blue;
+                          } else {
+                            // Not Selected
+                            return Colors.grey;
+                          }
+                        },
+                      ),
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      ),
+                    ),
+                    child: Text(
+                      'Fish',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
               ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+            ],
           ),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('users')
-              .where('type', isEqualTo: 'seller')
-              .orderBy('firstName')
-              .startAt([searchName]).endAt([searchName + "\uf8ff"]).snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              print('Error: ${snapshot.error}');
-              return Text('Error: ${snapshot.error}');
-              //return Text('Something went wrong');
-            }
-
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("Loading");
-            }
-            return ListView.builder(
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  var data = snapshot.data!.docs[index];
-                  return ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SellerProfileView(
-                                  userId: data.id,
-                                )),
-                      );
-                    },
-                    leading: CircleAvatar(
-                      radius: 24,
-                      //backgroundImage: NetworkImage(data['profileUrl']),
-                    ),
-                    title: Text(data['firstName']),
-                    subtitle: Text(data['email']),
-                  );
-                });
-          }),
+      body: isSellerSelected ? buildSellerListView() : buildFishListView(),
     );
   }
 }
