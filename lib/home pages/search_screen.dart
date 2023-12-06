@@ -106,14 +106,14 @@ class _SearchViewState extends State<SearchView> {
     );
   }
   
-  // Function to fetch and display fish data
   Future<String> getSellerName(String sellerID) async {
     var userDoc = await FirebaseFirestore.instance.collection('users').doc(sellerID).get();
     var firstName = userDoc['firstName'];
     var lastName = userDoc['lastName'];
     return '$firstName $lastName';
   }
-
+  
+  // Function to fetch and display fish data
   Widget buildFishListView() {
     return FutureBuilder<QuerySnapshot>(
       future: FirebaseFirestore.instance.collection('seller_info').get(),
