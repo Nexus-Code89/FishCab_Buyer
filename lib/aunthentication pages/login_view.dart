@@ -98,7 +98,13 @@ class _LoginPageState extends State<LoginPage> {
                                       ElevatedButton(
                                         child: const Text("ok"),
                                         onPressed: () async{
-                                          await FirebaseAuth.instance.sendPasswordResetEmail(email: _loginController.emailController.text);
+                                          await FirebaseAuth.instance.sendPasswordResetEmail(email: _loginController.emailController.text)
+                                              .then((value) {
+                                                _loginController.showErrorMessage(context, "sent");
+                                          })
+                                              .onError((error, stackTrace) {
+                                                _loginController.showErrorMessage(context, "Error: $error");
+                                          });
                                         },
                                       ),
                                     ],
