@@ -4,8 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/seller_pages/seller_profile_view.dart';
 import 'package:fish_cab/seller_side/seller_order_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fish_cab/home pages/bottom_navigation_bar.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -22,15 +24,72 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   // get instance of auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   LatLng? _currentPosition;
   LatLng basePosition = LatLng(10.30943566786076, 123.88635816441766);
   bool _isLoading = true;
+  List<LatLng> polylineCoordinates = [];
+  StreamSubscription? positionStream;
 
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getUserLocation().then((value) {
+      getPolyPoints();
+    });
+  }
+
+  @override
+  void dispose() {
+    positionStream!.cancel();
+
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  getUserLocation() async {
+    LocationPermission permission;
+    LocationSettings locationSettings;
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((Position position) async {
+      LatLng location = LatLng(position.latitude, position.longitude);
+
+      setState(() {
+        _currentPosition = location;
+        _isLoading = false;
+      });
+    });
+
+    permission = await Geolocator.requestPermission();
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      locationSettings = AndroidSettings(
+        accuracy: LocationAccuracy.high,
+        forceLocationManager: true,
+      );
+    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+      locationSettings = AppleSettings(
+        accuracy: LocationAccuracy.high,
+        activityType: ActivityType.fitness,
+        distanceFilter: 10,
+        pauseLocationUpdatesAutomatically: true,
+        // Only set to true if our app will be started up in the background.
+        showBackgroundLocationIndicator: false,
+      );
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      );
+    }
+
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
+      LatLng location = LatLng(position!.latitude, position.longitude);
+
+      setState(() {
+        _currentPosition = location;
+        _isLoading = false;
+      });
+    });
   }
 
   // get address of place from coordinates
@@ -45,8 +104,11 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   Future<Set<Marker>> getMarkersWithinRadius() async {
     final Set<Marker> markers = {};
 
-    final QuerySnapshot querySnapshot =
-        await _firestore.collection('orders').where('sellerID', isEqualTo: _firebaseAuth.currentUser!.uid).get();
+    final QuerySnapshot querySnapshot = await _firestore
+        .collection('orders')
+        .where('sellerID', isEqualTo: _firebaseAuth.currentUser!.uid)
+        .where('isConfirmed', isEqualTo: 'unconfirmed')
+        .get();
 
     final Marker marker = Marker(
       markerId: MarkerId('your_marker'),
@@ -96,6 +158,33 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
       _currentPosition = location;
       _isLoading = false;
     });
+  }
+
+  void getPolyPoints() async {
+    Set<Marker> markerList = await getMarkersWithinRadius();
+    bool isFirstMarker = true;
+    Marker previousMarker = Marker(markerId: new MarkerId('previousmarker'));
+    for (Marker m in markerList) {
+      if (isFirstMarker == true) {
+        isFirstMarker = false;
+        previousMarker = m;
+      }
+      PolylinePoints polylinePoints = PolylinePoints();
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+        'AIzaSyDu18f9V_o0s-cAui7XtJdJN7H_Yq_NCpw', // Your Google Map Key
+        PointLatLng(previousMarker!.position.latitude, previousMarker!.position.longitude),
+        PointLatLng(m.position.latitude, m.position.longitude),
+      );
+      if (result.points.isNotEmpty) {
+        result.points.forEach(
+          (PointLatLng point) => polylineCoordinates.add(
+            LatLng(point.latitude, point.longitude),
+          ),
+        );
+      }
+      previousMarker = m;
+      setState(() {});
+    }
   }
 
   Future<String> getBuyerName(String buyerID) async {
@@ -191,6 +280,7 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
     FirebaseFirestore.instance.collection('orders').doc(orderId).update({'isConfirmed': 'confirmed'}).then((value) {
       // Order marked as confirmed successfully
       // Show a confirmation message
+      setState(() {});
       showConfirmationDialog();
     }).catchError((error) {
       // Handle errors, e.g., show an error message
@@ -264,6 +354,14 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
                           _controller.complete(controller);
                         },
                         markers: Set<Marker>.of(snapshot.data!),
+                        polylines: {
+                          Polyline(
+                            polylineId: const PolylineId("route"),
+                            points: polylineCoordinates,
+                            color: const Color(0xFF7B61FF),
+                            width: 6,
+                          ),
+                        },
                       ),
                     ),
                   );

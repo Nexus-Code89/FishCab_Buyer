@@ -155,6 +155,7 @@ class _CartPageState extends State<CartPage> {
                 // Delete the item from the cart
                 Navigator.pop(context); // Close the confirmation dialog
                 deleteCartItem(context, index);
+                setState(() {});
               },
               child: Text('Yes'),
             ),
