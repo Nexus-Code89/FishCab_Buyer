@@ -43,6 +43,7 @@ class AuthPage extends StatelessWidget {
                   if (snapshot.hasData && snapshot.data != null) {
                     Map<String, dynamic> userData = snapshot.data!.data() as Map<String, dynamic>;
                     String userType = userData['type'] ?? ''; // Get type
+		                String userStatus = userData['status'] ?? ''; // Get Status
                     if (userType == 'seller') {
                       // Store the userId in SellerSingleton
                       SellerSingleton.instance.userId = userId;
@@ -50,7 +51,11 @@ class AuthPage extends StatelessWidget {
                       return SellerHomePage();
                     } else {
                       // User is not a seller, navigate to regular/user home page
-                      return HomePage();
+                      if (userStatus == 'enabled') {
+                          return HomePage();
+                      } else {
+                          signUserOut(context);
+                      }
                     }
                   }
                 }
@@ -69,4 +74,13 @@ class AuthPage extends StatelessWidget {
       ),
     );
   }
+
+    void signUserOut(BuildContext context) {
+      FirebaseAuth.instance.signOut().then((_) {
+        Navigator.pushReplacementNamed(context, '/auth'); // Navigate to AuthPage
+      }).catchError((error) {
+        // Handle error, if any
+        print("Error signing out: $error");
+      });
+    }
 }
