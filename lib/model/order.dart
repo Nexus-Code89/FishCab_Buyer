@@ -10,6 +10,7 @@ class Orders {
   List<CartItem> items;
   double totalPrice;
   Timestamp timestamp;
+  GeoPoint location;
 
   Orders({
     required this.documentID,
@@ -20,6 +21,6 @@ class Orders {
     required this.items,
     required this.totalPrice,
     required this.timestamp,
+    required this.location,
   });
 }
-

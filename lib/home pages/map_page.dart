@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/seller_pages/seller_profile_view.dart';
@@ -178,7 +177,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               Navigator.pushReplacementNamed(context, '/chats');
               break;
             case 4:
-              Navigator.pushReplacementNamed(context, '/notifications');
+              Navigator.pushReplacementNamed(context, '/orders');
               break;
           }
         },

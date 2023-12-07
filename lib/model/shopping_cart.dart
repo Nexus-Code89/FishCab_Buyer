@@ -14,8 +14,10 @@ class ShoppingCart {
     }
   }
 
-  void removeItem(CartItem item) {
-    items.remove(item);
+  void removeItem(index) {
+    if(index >= 0 && index < items.length) {
+      items.removeAt(index);
+    }
   }
 
   double getTotalPrice() {

@@ -12,10 +12,30 @@ class SellerHomePage extends StatefulWidget {
 class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+  bool _isLoading = true;
+  bool routeStarted = true;
+  String buttonText = "Loading...";
 
   final User? user = FirebaseAuth.instance.currentUser;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    getRouteStatus();
+  }
+
+  getRouteStatus() async {
+    DocumentSnapshot sellerInfo = await _firestore.collection('seller_info').doc(user?.uid).get();
+    var data = sellerInfo.data() as Map;
+
+    setState(() {
+      routeStarted = data['routeStarted'];
+      buttonText = routeStarted ? "Finish route" : "Start route";
+      _isLoading = false;
+    });
+  }
 
   // sign user out method
   void signUserOut(BuildContext context) {
@@ -47,47 +67,95 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
           actions: [
             IconButton(
               onPressed: () => signUserOut(context), // Pass the context to the function
-              icon: Icon(Icons.logout),
+              icon: const Icon(Icons.logout),
             ),
           ],
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            FutureBuilder(
-              future: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get(),
+            StreamBuilder(
+              stream: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Padding(
                     padding: const EdgeInsets.all(25.0),
                     child: Text(
-                      "Welcome, " + snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName'] + '!',
+                      '${"Welcome, " + snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName']}!',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   );
                 } else {
-                  return Text('Loading...');
+                  return const Text('Loading...');
                 }
               },
             ),
-            Padding(
-              padding: const EdgeInsets.all(25.0),
+            // placeholder text
+            const Padding(
+              padding: EdgeInsets.all(25.0),
               child: Text(
                 'To get started, set up your fish options.\n\nYou can modify your route & schedule time through the schedule tab.\n\nCommunicate with buyers through chats.',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
+
+            // start route button
             ElevatedButton(
-                onPressed: () async {
-                  QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("tokens").get();
+                style: ButtonStyle(minimumSize: MaterialStateProperty.all(Size(200, 80))),
+                onPressed: routeStarted
+                    ? () async {
+                        routeStarted = false;
+                        setState(() {
+                          buttonText = "Start Route";
+                        });
 
-                  List<dynamic> allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+                        await _firestore
+                            .collection('seller_info')
+                            .doc(user?.uid)
+                            .set({'routeStarted': false}, SetOptions(merge: true));
+                      }
+                    : () async {
+                        routeStarted = true;
 
-                  for (var data in allData) {
-                    FirebaseApi().sendPushMessage("Seller has started route", "Attention", data!['token']!);
-                  }
-                },
-                child: Text("Notify start route"))
+                        setState(() {
+                          buttonText = "Finish Route";
+                        });
+
+                        await _firestore
+                            .collection('seller_info')
+                            .doc(user?.uid)
+                            .set({'routeStarted': true}, SetOptions(merge: true));
+                        QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
+                            .collection("orders")
+                            .where("sellerID", isEqualTo: user?.uid)
+                            .where("isConfirmed", isEqualTo: "unconfirmed")
+                            .get();
+
+                        List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+                        List<String> buyers = [];
+
+                        for (var data in buyersData) {
+                          buyers.add(data["userID"]);
+                        }
+
+                        QuerySnapshot querySnapshot_Tokens = await FirebaseFirestore.instance
+                            .collection("tokens")
+                            .where(FieldPath.documentId, whereIn: buyers)
+                            .get();
+
+                        List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
+
+                        DocumentSnapshot currentUserDataSnapshot =
+                            await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
+
+                        for (var data in allData) {
+                          FirebaseApi().sendPushMessage(
+                              "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
+                              "Fresh fish is on its way!",
+                              data!['token']!);
+                        }
+                      },
+                child: Text(buttonText, style: TextStyle(fontSize: 20, fontFamily: 'Montserrat'))),
           ],
         ),
         bottomNavigationBar: SellerNavBar(
