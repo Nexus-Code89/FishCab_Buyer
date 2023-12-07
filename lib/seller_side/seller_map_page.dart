@@ -6,6 +6,7 @@ import 'package:fish_cab/seller_pages/seller_profile_view.dart';
 import 'package:fish_cab/seller_side/seller_order_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fish_cab/home pages/bottom_navigation_bar.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -26,11 +27,14 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   LatLng? _currentPosition;
   LatLng basePosition = LatLng(10.30943566786076, 123.88635816441766);
   bool _isLoading = true;
+  List<LatLng> polylineCoordinates = [];
 
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getLocation().then((value) {
+      getPolyPoints();
+    });
   }
 
   // get address of place from coordinates
@@ -99,6 +103,33 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
       _currentPosition = location;
       _isLoading = false;
     });
+  }
+
+  void getPolyPoints() async {
+    Set<Marker> markerList = await getMarkersWithinRadius();
+    bool isFirstMarker = true;
+    Marker previousMarker = Marker(markerId: new MarkerId('previousmarker'));
+    for (Marker m in markerList) {
+      if (isFirstMarker == true) {
+        isFirstMarker = false;
+        previousMarker = m;
+      }
+      PolylinePoints polylinePoints = PolylinePoints();
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+        'AIzaSyDu18f9V_o0s-cAui7XtJdJN7H_Yq_NCpw', // Your Google Map Key
+        PointLatLng(previousMarker!.position.latitude, previousMarker!.position.longitude),
+        PointLatLng(m.position.latitude, m.position.longitude),
+      );
+      if (result.points.isNotEmpty) {
+        result.points.forEach(
+          (PointLatLng point) => polylineCoordinates.add(
+            LatLng(point.latitude, point.longitude),
+          ),
+        );
+      }
+      previousMarker = m;
+      setState(() {});
+    }
   }
 
   Future<String> getBuyerName(String buyerID) async {
@@ -268,6 +299,14 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
                           _controller.complete(controller);
                         },
                         markers: Set<Marker>.of(snapshot.data!),
+                        polylines: {
+                          Polyline(
+                            polylineId: const PolylineId("route"),
+                            points: polylineCoordinates,
+                            color: const Color(0xFF7B61FF),
+                            width: 6,
+                          ),
+                        },
                       ),
                     ),
                   );
