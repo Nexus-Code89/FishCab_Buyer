@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fish_cab/aunthentication%20pages/login_or_register_page.dart';
+import 'package:fish_cab/auth%20pages/login_or_register_page.dart';
 import 'package:fish_cab/seller_side/seller_home_page.dart';
 import 'package:fish_cab/seller_side/seller_singleton.dart';
 import 'package:flutter/material.dart';

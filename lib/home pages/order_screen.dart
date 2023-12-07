@@ -27,7 +27,6 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
             .collection('orders')
             .where('userID', isEqualTo: _firebaseAuth.currentUser!.uid)
             .where('status', isEqualTo: 'pending')
-            //.orderBy('timestamp', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

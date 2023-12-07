@@ -154,6 +154,8 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
                               "Fresh fish is on its way!",
                               data!['token']!);
                         }
+
+                        Navigator.pushReplacementNamed(context, '/seller_map');
                       },
                 child: Text(buttonText, style: TextStyle(fontSize: 20, fontFamily: 'Montserrat'))),
           ],
