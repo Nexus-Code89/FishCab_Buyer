@@ -20,8 +20,17 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Search Screen'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70.0),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0, left: 10.0),
+          child: AppBar(
+            title: Text("Search"),
+            backgroundColor: Colors.white,
+            shadowColor: Colors.transparent,
+            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+          ),
+        ),
       ),
       body: SearchView(), // Extracted into a separate stateful widget
       bottomNavigationBar: CustomBottomNavigationBar(
