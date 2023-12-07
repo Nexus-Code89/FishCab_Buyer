@@ -45,8 +45,11 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   Future<Set<Marker>> getMarkersWithinRadius() async {
     final Set<Marker> markers = {};
 
-    final QuerySnapshot querySnapshot =
-        await _firestore.collection('orders').where('sellerID', isEqualTo: _firebaseAuth.currentUser!.uid).get();
+    final QuerySnapshot querySnapshot = await _firestore
+        .collection('orders')
+        .where('sellerID', isEqualTo: _firebaseAuth.currentUser!.uid)
+        .where('isConfirmed', isEqualTo: 'unconfirmed')
+        .get();
 
     final Marker marker = Marker(
       markerId: MarkerId('your_marker'),
@@ -191,6 +194,7 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
     FirebaseFirestore.instance.collection('orders').doc(orderId).update({'isConfirmed': 'confirmed'}).then((value) {
       // Order marked as confirmed successfully
       // Show a confirmation message
+      setState(() {});
       showConfirmationDialog();
     }).catchError((error) {
       // Handle errors, e.g., show an error message
