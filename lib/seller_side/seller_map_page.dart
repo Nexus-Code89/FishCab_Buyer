@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/seller_pages/seller_profile_view.dart';
 import 'package:fish_cab/seller_side/seller_order_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fish_cab/home pages/bottom_navigation_bar.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -23,17 +24,71 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   // get instance of auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   LatLng? _currentPosition;
   LatLng basePosition = LatLng(10.30943566786076, 123.88635816441766);
   bool _isLoading = true;
   List<LatLng> polylineCoordinates = [];
+  StreamSubscription? positionStream;
 
   @override
   void initState() {
     super.initState();
-    getLocation().then((value) {
+    getUserLocation().then((value) {
       getPolyPoints();
+    });
+  }
+
+  @override
+  void dispose() {
+    positionStream!.cancel();
+
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  getUserLocation() async {
+    LocationPermission permission;
+    LocationSettings locationSettings;
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((Position position) async {
+      LatLng location = LatLng(position.latitude, position.longitude);
+
+      setState(() {
+        _currentPosition = location;
+        _isLoading = false;
+      });
+    });
+
+    permission = await Geolocator.requestPermission();
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      locationSettings = AndroidSettings(
+        accuracy: LocationAccuracy.high,
+        forceLocationManager: true,
+      );
+    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+      locationSettings = AppleSettings(
+        accuracy: LocationAccuracy.high,
+        activityType: ActivityType.fitness,
+        distanceFilter: 10,
+        pauseLocationUpdatesAutomatically: true,
+        // Only set to true if our app will be started up in the background.
+        showBackgroundLocationIndicator: false,
+      );
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      );
+    }
+
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
+      LatLng location = LatLng(position!.latitude, position.longitude);
+
+      setState(() {
+        _currentPosition = location;
+        _isLoading = false;
+      });
     });
   }
 
