@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
+import 'package:fish_cab/seller_side/seller_map_page.dart';
 import 'package:flutter/material.dart';
 
 class SellerHomePage extends StatefulWidget {
@@ -32,7 +33,6 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
 
     setState(() {
       routeStarted = data['routeStarted'];
-      buttonText = routeStarted ? "Finish route" : "Start route";
       _isLoading = false;
     });
   }
@@ -112,62 +112,41 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
             // start route button
             ElevatedButton(
                 style: ButtonStyle(minimumSize: MaterialStateProperty.all(Size(200, 80))),
-                onPressed: routeStarted
-                    ? () async {
-                        routeStarted = false;
-                        setState(() {
-                          buttonText = "Start Route";
-                        });
+                onPressed: () async {
+                  routeStarted = true;
 
-                        await _firestore
-                            .collection('seller_info')
-                            .doc(user?.uid)
-                            .set({'routeStarted': false}, SetOptions(merge: true));
-                      }
-                    : () async {
-                        routeStarted = true;
+                  await _firestore.collection('seller_info').doc(user?.uid).set({'routeStarted': true}, SetOptions(merge: true));
+                  QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
+                      .collection("orders")
+                      .where("sellerID", isEqualTo: user?.uid)
+                      .where("isConfirmed", isEqualTo: "unconfirmed")
+                      .get();
 
-                        setState(() {
-                          buttonText = "Finish Route";
-                        });
+                  List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+                  List<String> buyers = [];
 
-                        await _firestore
-                            .collection('seller_info')
-                            .doc(user?.uid)
-                            .set({'routeStarted': true}, SetOptions(merge: true));
-                        QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
-                            .collection("orders")
-                            .where("sellerID", isEqualTo: user?.uid)
-                            .where("isConfirmed", isEqualTo: "unconfirmed")
-                            .get();
+                  for (var data in buyersData) {
+                    buyers.add(data["userID"]);
+                  }
 
-                        List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
-                        List<String> buyers = [];
+                  QuerySnapshot querySnapshot_Tokens =
+                      await FirebaseFirestore.instance.collection("tokens").where(FieldPath.documentId, whereIn: buyers).get();
 
-                        for (var data in buyersData) {
-                          buyers.add(data["userID"]);
-                        }
+                  List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
 
-                        QuerySnapshot querySnapshot_Tokens = await FirebaseFirestore.instance
-                            .collection("tokens")
-                            .where(FieldPath.documentId, whereIn: buyers)
-                            .get();
+                  DocumentSnapshot currentUserDataSnapshot =
+                      await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
 
-                        List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
+                  for (var data in allData) {
+                    FirebaseApi().sendPushMessage(
+                        "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
+                        "Fresh fish is on its way!",
+                        data!['token']!);
+                  }
 
-                        DocumentSnapshot currentUserDataSnapshot =
-                            await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
-
-                        for (var data in allData) {
-                          FirebaseApi().sendPushMessage(
-                              "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
-                              "Fresh fish is on its way!",
-                              data!['token']!);
-                        }
-
-                        Navigator.pushReplacementNamed(context, '/seller_map');
-                      },
-                child: Text(buttonText, style: TextStyle(fontSize: 20, fontFamily: 'Montserrat'))),
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => SellerMapPage()));
+                },
+                child: Text('Start Route', style: TextStyle(fontSize: 20, fontFamily: 'Montserrat'))),
           ],
         ),
         bottomNavigationBar: SellerNavBar(
