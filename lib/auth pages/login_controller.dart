@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fish_cab/aunthentication%20pages/login_model.dart';
+import 'package:fish_cab/auth%20pages/login_model.dart';
 import 'package:flutter/material.dart';
 
 // Controller

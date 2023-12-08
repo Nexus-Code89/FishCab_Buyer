@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/components/my_button.dart';
 import 'package:fish_cab/components/my_textfield.dart';
-import 'package:fish_cab/aunthentication%20pages/login_controller.dart';
-import 'package:fish_cab/aunthentication%20pages/login_model.dart';
+import 'package:fish_cab/auth%20pages/login_controller.dart';
+import 'package:fish_cab/auth%20pages/login_model.dart';
 import 'package:flutter/material.dart';
 
 // View
@@ -83,10 +84,32 @@ class _LoginPageState extends State<LoginPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
+                      TextButton(
+                          style: TextButton.styleFrom(textStyle: TextStyle(color: Colors.grey[600])),
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    content: Text("Send change password request to ${_loginController.emailController.text}?"),
+                                    actions: [
+                                      ElevatedButton(
+                                        child: const Text("ok"),
+                                        onPressed: () async {
+                                          await FirebaseAuth.instance
+                                              .sendPasswordResetEmail(email: _loginController.emailController.text)
+                                              .then((value) {
+                                            _loginController.showErrorMessage(context, "sent");
+                                          }).onError((error, stackTrace) {
+                                            _loginController.showErrorMessage(context, "Error: $error");
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                });
+                          },
+                          child: Text("Forgot Password?")),
                     ],
                   ),
                 ),

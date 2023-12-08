@@ -1,5 +1,5 @@
 import 'package:fish_cab/api/firebase_api.dart';
-import 'package:fish_cab/aunthentication%20pages/auth_page.dart';
+import 'package:fish_cab/auth%20pages/auth_page.dart';
 import 'package:fish_cab/home%20pages/chats_screen.dart';
 import 'package:fish_cab/home%20pages/home_page.dart';
 import 'package:fish_cab/home%20pages/map_page.dart';
@@ -16,6 +16,7 @@ import 'package:fish_cab/seller_side/seller_add_fish_option.dart';
 import 'package:fish_cab/seller_side/seller_chats_screen.dart';
 import 'package:fish_cab/seller_side/seller_fish_options_page.dart';
 import 'package:fish_cab/seller_side/seller_home_page.dart';
+import 'package:fish_cab/seller_side/seller_map_page.dart';
 import 'package:fish_cab/seller_side/seller_order_page.dart';
 import 'package:fish_cab/seller_side/seller_schedule_page.dart';
 import 'package:fish_cab/seller_side/seller_set_location2.dart';
@@ -41,7 +42,6 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-
   const MyApp({super.key});
 
   @override
@@ -51,7 +51,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: '/auth', // Set the initial route
         routes: {
-          '/auth': (context) => AuthPage(token: token!,),
+          '/auth': (context) => AuthPage(
+                token: token!,
+              ),
           '/home': (context) => HomePage(),
           '/search': (context) => SearchScreen(),
           '/map': (context) => MapPage(),
@@ -86,6 +88,7 @@ class MyApp extends StatelessWidget {
               ),
           '/seller_set_location1': (context) => SellerSetLocation1(),
           '/seller_set_location2': (context) => SellerSetLocation2(),
+          '/seller_map': (context) => SellerMapPage(),
         });
   }
 }
