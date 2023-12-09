@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
 import 'package:fish_cab/seller_side/seller_map_page.dart';
@@ -38,9 +39,13 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
   }
 
   // sign user out method
-  void signUserOut(BuildContext context) {
-    FirebaseAuth.instance.signOut().then((_) {
-      Navigator.pushReplacementNamed(context, '/auth'); // Navigate to AuthPage
+  void signUserOut(BuildContext context) async {
+    FirebaseAuth.instance.signOut().then((_) async {
+      // Navigate to AuthPage
+      FirebaseMessaging.instance.deleteToken;
+      await FirebaseFirestore.instance.collection("tokens").doc(user?.uid).delete().then((_) {
+        Navigator.pushReplacementNamed(context, '/auth');
+      });
     }).catchError((error) {
       // Handle error, if any
       print("Error signing out: $error");
