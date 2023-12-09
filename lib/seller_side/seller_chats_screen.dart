@@ -49,7 +49,7 @@ class _SellerChatsScreenState extends State<SellerChatsScreen> with AutomaticKee
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      SellerChatsPage(receiverUserEmail: data['email'], receiverUserID: data.id)));
+                                      SellerChatsPage(receiverName: data['firstName'] + ' ' + data['lastName'], receiverUserID: data.id)));
                         },
                         leading: CircleAvatar(
                           radius: 24,

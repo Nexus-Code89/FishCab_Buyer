@@ -75,7 +75,7 @@ class SellerHomeScreen extends StatelessWidget {
                         onPressed: (){
                           Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => ChatsPage(receiverUserEmail: sellerEmail, receiverUserID: userId)));
+                              MaterialPageRoute(builder: (context) => ChatsPage(receiverName: sellerEmail, receiverUserID: userId)));
                         },
                         child: Text('Chat'))
                   ],

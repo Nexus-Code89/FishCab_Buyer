@@ -9,11 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:fish_cab/home pages/bottom_navigation_bar.dart';
 
 class ChatsPage extends StatefulWidget {
-  final String receiverUserEmail;
+  final String receiverName;
   final String receiverUserID;
   const ChatsPage({
     super.key,
-    required this.receiverUserEmail,
+    required this.receiverName,
     required this.receiverUserID,
   });
 
@@ -42,7 +42,7 @@ class _ChatsPageState extends State<ChatsPage> with AutomaticKeepAliveClientMixi
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.receiverUserEmail),
+        title: Text(widget.receiverName),
       ),
       body: Column(
         children: [

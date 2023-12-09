@@ -8,11 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:fish_cab/home pages/bottom_navigation_bar.dart';
 
 class SellerChatsPage extends StatefulWidget {
-  final String receiverUserEmail;
+  final String receiverName;
   final String receiverUserID;
   const SellerChatsPage({
     super.key,
-    required this.receiverUserEmail,
+    required this.receiverName,
     required this.receiverUserID,
   });
 
@@ -41,7 +41,7 @@ class _SellerChatsPageState extends State<SellerChatsPage> with AutomaticKeepAli
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.receiverUserEmail),
+        title: Text(widget.receiverName),
       ),
       body: Column(
         children: [
