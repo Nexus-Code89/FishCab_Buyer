@@ -4,14 +4,20 @@ import 'package:flutter/material.dart';
 class AuthNoticePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    showAccountBannedDialog(context);
+    Future.delayed(Duration.zero, () => showAccountBannedDialog(context));
     return Scaffold(
       appBar: AppBar(
         title: Text('Authentication Notice'),
       ),
-      body: Center(
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: (){
+          showAccountBannedDialog(context);
+        },
+        child: Center(
         child: Text('You have been redirected due to authentication notice.'),
       ),
+      )
     );
   }
     void showAccountBannedDialog(BuildContext context) {
