@@ -26,7 +26,7 @@ class AuthNoticePage extends StatelessWidget {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Notice'),
-            content: Text('Acoount has been banned.'),
+            content: Text('Account has been banned.'),
             actions: [
               ElevatedButton(
                 onPressed: () {
