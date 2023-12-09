@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fish_cab/auth%20pages/auth_page_notice.dart';
 import 'package:fish_cab/auth%20pages/login_or_register_page.dart';
 import 'package:fish_cab/seller_side/seller_home_page.dart';
 import 'package:fish_cab/seller_side/seller_singleton.dart';
@@ -44,18 +45,14 @@ class AuthPage extends StatelessWidget {
                     Map<String, dynamic> userData = snapshot.data!.data() as Map<String, dynamic>;
                     String userType = userData['type'] ?? ''; // Get type
 		                String userStatus = userData['status'] ?? ''; // Get Status
-                    if (userType == 'seller') {
-                      // Store the userId in SellerSingleton
-                      SellerSingleton.instance.userId = userId;
-                      // User is a seller, navigate to SellerHomePage
-                      return SellerHomePage();
-                    } else {
-                      // User is not a seller, navigate to regular/user home page
-                      if (userStatus == 'enabled') {
+
+                    if (userType == 'seller' && userStatus == 'enabled') {
+                          SellerSingleton.instance.userId = userId;
+                          return SellerHomePage();
+                    } else if (userType == 'buyer' && userStatus == 'enabled'){
                           return HomePage();
-                      } else {
-                          signUserOut(context);
-                      }
+                    } else {
+                          return AuthNoticePage();
                     }
                   }
                 }
