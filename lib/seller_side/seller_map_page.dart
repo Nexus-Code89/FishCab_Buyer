@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/seller_pages/seller_profile_view.dart';
 import 'package:fish_cab/seller_side/seller_order_page.dart';
 import 'package:flutter/foundation.dart';
@@ -23,6 +24,7 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   bool get wantKeepAlive => true;
 
   // get instance of auth
+  final User? user = FirebaseAuth.instance.currentUser;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -44,8 +46,6 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   @override
   void dispose() {
     positionStream!.cancel();
-
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -93,13 +93,42 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
           .collection('seller_info')
           .doc(_firebaseAuth.currentUser?.uid)
           .set({'loc_current': new GeoPoint(location.latitude, location.longitude)}, SetOptions(merge: true)).then((value) {
-        print("whats");
         setState(() {
           _currentPosition = location;
           _isLoading = false;
         });
       });
     });
+  }
+
+  sendNotif() async {
+    await _firestore.collection('seller_info').doc(user?.uid).set({'routeStarted': true}, SetOptions(merge: true));
+    QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
+        .collection("orders")
+        .where("sellerID", isEqualTo: user?.uid)
+        .where("isConfirmed", isEqualTo: "unconfirmed")
+        .get();
+
+    List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+    List<String> buyers = [];
+
+    for (var data in buyersData) {
+      buyers.add(data["userID"]);
+    }
+
+    QuerySnapshot querySnapshot_Tokens =
+        await FirebaseFirestore.instance.collection("tokens").where(FieldPath.documentId, whereIn: buyers).get();
+
+    List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
+
+    DocumentSnapshot currentUserDataSnapshot = await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
+
+    for (var data in allData) {
+      FirebaseApi().sendPushMessage(
+          "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
+          "Fresh fish is on its way!",
+          data!['token']!);
+    }
   }
 
   // get address of place from coordinates
@@ -145,7 +174,7 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
         infoWindow: InfoWindow(title: address, snippet: ''),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         onTap: () {
-          showOrderDetails(doc, buyerName!);
+          showOrderDetails(doc, buyerName);
         },
       );
       markers.add(marker);

@@ -36,74 +36,73 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
   bool _isLoading = true;
   List<LatLng> polylineCoordinates = [];
   StreamSubscription? positionStream;
+  late Set<Marker> allMarkers;
 
   @override
   void initState() {
     super.initState();
-    getUserLocation().then((value) {
+    getLocation().then((value) {
       getPolyPoints();
     });
   }
 
-  @override
-  void dispose() {
-    positionStream!.cancel();
+  // @override
+  // void dispose() {
+  //   positionStream!.cancel();
 
-    // TODO: implement dispose
-    super.dispose();
-  }
+  //   // TODO: implement dispose
+  //   super.dispose();
+  // }
 
-  getUserLocation() async {
-    LocationPermission permission;
-    LocationSettings locationSettings;
-    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((Position position) async {
-      LatLng location = LatLng(position.latitude, position.longitude);
-      await _firestore
-          .collection('seller_info')
-          .doc(_firebaseAuth.currentUser?.uid)
-          .set({'loc_current': new GeoPoint(location.latitude, location.longitude)}, SetOptions(merge: true)).then((value) {
-        setState(() {
-          _currentPosition = location;
-          _isLoading = false;
-        });
-      });
-    });
+  // getUserLocation() async {
+  //   LocationPermission permission;
+  //   LocationSettings locationSettings;
+  //   await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((Position position) async {
+  //     LatLng location = LatLng(position.latitude, position.longitude);
+  //     await _firestore
+  //         .collection('seller_info')
+  //         .doc(_firebaseAuth.currentUser?.uid)
+  //         .set({'loc_current': new GeoPoint(location.latitude, location.longitude)}, SetOptions(merge: true)).then((value) {
+  //       setState(() {
+  //         _currentPosition = location;
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   });
 
-    permission = await Geolocator.requestPermission();
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      locationSettings = AndroidSettings(
-        accuracy: LocationAccuracy.high,
-        forceLocationManager: true,
-      );
-    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
-      locationSettings = AppleSettings(
-        accuracy: LocationAccuracy.high,
-        activityType: ActivityType.fitness,
-        distanceFilter: 50,
-        pauseLocationUpdatesAutomatically: true,
-        // Only set to true if our app will be started up in the background.
-        showBackgroundLocationIndicator: false,
-      );
-    } else {
-      locationSettings = const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 50,
-      );
-    }
+  //   permission = await Geolocator.requestPermission();
+  //   if (defaultTargetPlatform == TargetPlatform.android) {
+  //     locationSettings = AndroidSettings(
+  //       accuracy: LocationAccuracy.high,
+  //       forceLocationManager: true,
+  //     );
+  //   } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+  //     locationSettings = AppleSettings(
+  //       accuracy: LocationAccuracy.high,
+  //       activityType: ActivityType.fitness,
+  //       distanceFilter: 50,
+  //       pauseLocationUpdatesAutomatically: true,
+  //       // Only set to true if our app will be started up in the background.
+  //       showBackgroundLocationIndicator: false,
+  //     );
+  //   } else {
+  //     locationSettings = const LocationSettings(
+  //       accuracy: LocationAccuracy.high,
+  //       distanceFilter: 50,
+  //     );
+  //   }
 
-    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
-      LatLng location = LatLng(position!.latitude, position.longitude);
-      await _firestore
-          .collection('seller_info')
-          .doc(_firebaseAuth.currentUser?.uid)
-          .set({'loc_current': new GeoPoint(location.latitude, location.longitude)}, SetOptions(merge: true)).then((value) {
-        setState(() {
-          _currentPosition = location;
-          _isLoading = false;
-        });
-      });
-    });
-  }
+  //   positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
+  //     LatLng location = LatLng(position!.latitude, position.longitude);
+  //     await _firestore.collection('seller_info').doc(_firebaseAuth.currentUser?.uid).get().then((value) {
+  //       myDoc.data
+  //       setState(() {
+  //         _currentPosition = location;
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   });
+  // }
 
   // get address of place from coordinates
   Future<String> getPlaceAddress(double lat, double lng) async {
@@ -114,38 +113,10 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
   }
 
   // get all order markers
-  Future<Set<Marker>> getMarkersWithinRadius() async {
-    final Set<Marker> markers = {};
+  // getMarkersWithinRadius() async {
 
-    final DocumentSnapshot doc = await _firestore.collection('seller_info').doc(widget.sellerId).get();
-
-    final Marker marker = Marker(
-      markerId: MarkerId('your_marker'),
-      position: _currentPosition!,
-      infoWindow: InfoWindow(title: 'You', snippet: 'Your current location'),
-      onTap: () {},
-    );
-    markers.add(marker);
-
-    final MarkerId markerId = MarkerId(doc.id);
-    final latitude = (doc.data() as dynamic)?['loc_current'].latitude;
-    final longitude = (doc.data() as dynamic)?['loc_current'].longitude;
-    final address = await getPlaceAddress(latitude, longitude);
-
-    final Marker marker_seller = Marker(
-      markerId: markerId,
-      position: LatLng(
-        latitude,
-        longitude,
-      ),
-      infoWindow: InfoWindow(title: address, snippet: ''),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-    );
-
-    markers.add(marker_seller);
-
-    return markers;
-  }
+  //   return markers;
+  // }
 
   // get current location of device
   getLocation() async {
@@ -165,7 +136,7 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
   }
 
   getPolyPoints() async {
-    Set<Marker> markerList = await getMarkersWithinRadius();
+    Set<Marker> markerList = allMarkers;
     bool isFirstMarker = true;
     Marker previousMarker = Marker(markerId: new MarkerId('previousmarker'));
     for (Marker m in markerList) {
@@ -200,20 +171,47 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : FutureBuilder(
-              future: getMarkersWithinRadius(),
+          : StreamBuilder(
+              stream: _firestore.collection('seller_info').doc(widget.sellerId).snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
+                  final Set<Marker> markers = {};
+
+                  final Marker marker = Marker(
+                    markerId: MarkerId('your_marker'),
+                    position: _currentPosition!,
+                    infoWindow: InfoWindow(title: 'You', snippet: 'Your current location'),
+                    onTap: () {},
+                  );
+                  markers.add(marker);
+
+                  final MarkerId markerId = MarkerId(snapshot.data!.id);
+                  final latitude = snapshot.data!['loc_current'].latitude;
+                  final longitude = snapshot.data!['loc_current'].longitude;
+
+                  final Marker marker_seller = Marker(
+                    markerId: markerId,
+                    position: LatLng(
+                      latitude,
+                      longitude,
+                    ),
+                    infoWindow: InfoWindow(title: 'Seller', snippet: ''),
+                    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                  );
+
+                  markers.add(marker_seller);
+                  allMarkers = markers;
+
                   return GoogleMap(
                     mapType: MapType.terrain,
                     initialCameraPosition: CameraPosition(
-                      target: _currentPosition!,
+                      target: LatLng(snapshot.data!['loc_current'].latitude, snapshot.data!['loc_current'].longitude),
                       zoom: 14.0,
                     ),
                     onMapCreated: (GoogleMapController controller) {
                       _controller.complete(controller);
                     },
-                    markers: Set<Marker>.of(snapshot.data!),
+                    markers: markers,
                     polylines: {
                       Polyline(
                         polylineId: const PolylineId("route"),
