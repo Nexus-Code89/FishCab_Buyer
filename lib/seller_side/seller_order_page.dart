@@ -14,8 +14,17 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Seller Orders'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70.0),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0, left: 10.0),
+          child: AppBar(
+            title: Text("Orders"),
+            backgroundColor: Colors.white,
+            shadowColor: Colors.transparent,
+            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+          ),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -96,14 +105,14 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
               // Navigate to Schedule Page
               Navigator.pushReplacementNamed(context, '/seller_schedule');
               break;
-            /*case 3:
+            case 3:
               // Navigate to Chats Page
-              Navigator.pushReplacementNamed(context, '/chats');
-              break;*/
-            /*case 4:
+              Navigator.pushReplacementNamed(context, '/seller_chats');
+              break;
+            case 4:
               // Navigate to Orders Page
               Navigator.pushReplacementNamed(context, '/seller_orders');
-              break;*/
+              break;
           }
         },
       ),
@@ -126,121 +135,116 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
     return itemNames.join(', ');
   }
 
-void showOrderDetails(QueryDocumentSnapshot order, String buyerName) {
-  List<dynamic> items = order['items'];
+  void showOrderDetails(QueryDocumentSnapshot order, String buyerName) {
+    List<dynamic> items = order['items'];
 
-  // Define colors based on order status
-  Color statusColor = order['status'] == 'received' ? Colors.green : Colors.yellow;
+    // Define colors based on order status
+    Color statusColor = order['status'] == 'received' ? Colors.green : Colors.yellow;
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Order Details', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        content: Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Buyer: $buyerName', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                SizedBox(height: 16.0),
-                Text('Order Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                SizedBox(height: 8.0),
-                for (var item in items)
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Order Details', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          content: Container(
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Buyer: $buyerName', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 16.0),
+                  Text('Order Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 8.0),
+                  for (var item in items)
+                    ListTile(
+                      title: Text(
+                        '${item['name']}',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Price: \₱${item['price']} per kg'),
+                          Text('Quantity: ${item['quantity']} kg'),
+                          Text(
+                            'Total: \₱${(item['price'] * item['quantity']).toStringAsFixed(2)}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      contentPadding: EdgeInsets.all(0),
+                    ),
+                  SizedBox(height: 16.0),
+                  Divider(thickness: 1),
                   ListTile(
                     title: Text(
-                      '${item['name']}',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      'Total Price: \₱${order['totalPrice']}',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  SizedBox(height: 16.0),
+                  ListTile(
+                    title: Row(
                       children: [
-                        Text('Price: \₱${item['price']} per kg'),
-                        Text('Quantity: ${item['quantity']} kg'),
                         Text(
-                          'Total: \₱${(item['price'] * item['quantity']).toStringAsFixed(2)}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          'Status: ',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                        ),
+                        Text(
+                          '${order['status']}',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: statusColor),
+                        ),
+                        SizedBox(width: 16.0), // Add space between status and Confirm button
+                        ElevatedButton(
+                          onPressed: () {
+                            //"Confirm" button press
+                            confirmOrder(order.id);
+                            Navigator.pop(context);
+                          },
+                          child: Text('Confirm'),
                         ),
                       ],
                     ),
-                    contentPadding: EdgeInsets.all(0),
                   ),
-                SizedBox(height: 16.0),
-                Divider(thickness: 1),
-                ListTile(
-                  title: Text(
-                    'Total Price: \₱${order['totalPrice']}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(height: 16.0),
-                ListTile(
-                  title: Row(
-                    children: [
-                      Text(
-                        'Status: ',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
-                      ),
-                      Text(
-                        '${order['status']}',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: statusColor),
-                      ),
-                      SizedBox(width: 16.0), // Add space between status and Confirm button
-                      ElevatedButton(
-                        onPressed: () {
-                          //"Confirm" button press
-                          confirmOrder(order.id);
-                          Navigator.pop(context);
-                        },
-                        child: Text('Confirm'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
-void confirmOrder(String orderId) {
-  FirebaseFirestore.instance
-    .collection('orders')
-    .doc(orderId)
-    .update({'isConfirmed': 'confirmed'})
-    .then((value) {
+  void confirmOrder(String orderId) {
+    FirebaseFirestore.instance.collection('orders').doc(orderId).update({'isConfirmed': 'confirmed'}).then((value) {
       // Order marked as confirmed successfully
       // Show a confirmation message
       showConfirmationDialog();
-    })
-    .catchError((error) {
+    }).catchError((error) {
       // Handle errors, e.g., show an error message
       print('Error marking order as confirmed: $error');
     });
-}
+  }
 
-void showConfirmationDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Order Confirmed'),
-        content: Text('The order has been confirmed.'),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Close the dialog
-            },
-            child: Text('OK'),
-          ),
-        ],
-      );
-    },
-  );
- }
+  void showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Order Confirmed'),
+          content: Text('The order has been confirmed.'),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

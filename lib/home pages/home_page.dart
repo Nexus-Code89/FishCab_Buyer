@@ -42,13 +42,23 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-              onPressed: () => signUserOut(context), // Pass the context to the function
-              icon: Icon(Icons.logout),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(70.0),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20.0, left: 10.0),
+            child: AppBar(
+              title: Text("Home"),
+              backgroundColor: Colors.white,
+              shadowColor: Colors.transparent,
+              titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+              actions: [
+                IconButton(
+                  onPressed: () => signUserOut(context), // Pass the context to the function
+                  icon: const Icon(Icons.logout, color: Colors.blue),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -72,7 +82,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
             Padding(
               padding: const EdgeInsets.all(25.0),
               child: Text(
-                'To get started, search for sellers via the search function or through the map.\n\nCommunicate with sellers through chats.\n\nSet notifications for orders through the notifications tab.',
+                'To get started, search for sellers via the search function or through the map.\n\nCommunicate with sellers through chats.\n\nView your orders through the orders tab.',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             )
