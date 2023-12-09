@@ -66,10 +66,19 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
                     ),
                   );
                 },
+                
               );
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Navigate to SellerDemandPage when the button is pressed
+          Navigator.pushNamed(context, '/seller_demand');
+        },
+        child: Icon(Icons.how_to_vote),
+        tooltip: 'View Demands', // Optional tooltip for accessibility
       ),
       bottomNavigationBar: SellerNavBar(
         currentIndex: 4,
