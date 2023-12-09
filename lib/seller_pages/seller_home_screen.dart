@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fish_cab/home%20pages/chats_model.dart';
 import 'package:fish_cab/review-rating%20pages/make_review_screen.dart';
 import 'package:fish_cab/review-rating%20pages/view_reviews_screen.dart';
 import 'package:flutter/material.dart';
@@ -53,22 +54,38 @@ class SellerHomeScreen extends StatelessWidget {
                       'Email: $sellerEmail',
                       style: TextStyle(fontSize: 16),
                     ),
-                    const SizedBox(height: 10,),
-                    ElevatedButton(
-                        onPressed: (){
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ReviewView(reviewee: userId)));
-                        },
-                        child: Text('Make review')),
-                    const SizedBox(height: 10,),
-                    ElevatedButton(
-                        onPressed: (){
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: userId)));
-                        },
-                        child: Text('View reviews'))
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => ReviewView(reviewee: userId)));
+                            },
+                            child: Text('Make review')),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: userId)));
+                            },
+                            child: Text('View reviews')),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ChatsPage(receiverUserEmail: sellerEmail, receiverUserID: userId)));
+                            },
+                            child: Text('Chat')),
+                      ],
+                    )
                   ],
                 ),
               ),

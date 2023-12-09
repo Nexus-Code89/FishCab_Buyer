@@ -19,11 +19,19 @@ class SellerProfileView extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Seller Profile'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70.0),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0, left: 10.0),
+          child: AppBar(
+            title: Text("Seller Profile"),
+            backgroundColor: Colors.white,
+            shadowColor: Colors.transparent,
+            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+          ),
+        ),
       ),
       body: Container(), // You can customize this part if needed
     );
   }
 }
-

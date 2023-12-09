@@ -155,6 +155,7 @@ class _CartPageState extends State<CartPage> {
                 // Delete the item from the cart
                 Navigator.pop(context); // Close the confirmation dialog
                 deleteCartItem(context, index);
+                setState(() {});
               },
               child: Text('Yes'),
             ),
@@ -218,8 +219,7 @@ class _CartPageState extends State<CartPage> {
           .toList(),
       'totalPrice': order.totalPrice,
       'timestamp': order.timestamp,
-      'locationPoint': order.location,
-      'locationAddress': order.location,
+      'location': order.location,
     }).then((value) {
       // Order placed successfully, we can add additional logic here
       // For example, clear the cart or show a success message
