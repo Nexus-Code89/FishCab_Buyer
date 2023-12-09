@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fish_cab/components/my_button.dart';
 import 'package:fish_cab/home%20pages/bottom_navigation_bar.dart';
+import 'package:fish_cab/home%20pages/map_ongoing.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,6 +26,76 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
       // Handle error, if any
       print("Error signing out: $error");
     });
+  }
+
+  Widget _buildSellerList() {
+    return StreamBuilder(
+        stream: _firestore.collection('seller_info').where('routeStarted', isEqualTo: true).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error${snapshot.error}');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text('Loading...');
+          }
+
+          return ListView(
+            children: snapshot.data!.docs.map((document) => _buildSellerItem(document)).toList(),
+          );
+        });
+  }
+
+  Widget _buildSellerItem(DocumentSnapshot document) {
+    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+    return Container(
+      // TO DO: change email to name
+      alignment: Alignment.center,
+      child: FutureBuilder(
+          future: FirebaseFirestore.instance.collection('users').doc(document.id).get(),
+          builder: (context, snapshot) {
+            String sellerName = '';
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError || snapshot.data == null) {
+                return Center(
+                  child: Text('Error loading user data'),
+                );
+              } else {
+                Map<String, dynamic> sellerData = snapshot.data!.data() as Map<String, dynamic>;
+                sellerName = sellerData['firstName'] + ' ' + sellerData['lastName']; // Get type
+              }
+              return Container(
+                padding: const EdgeInsets.all(12),
+                height: 100,
+                width: 300,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey.shade100,
+                ),
+                child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                  Text(sellerName),
+                  MyButton(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
+                      },
+                      text: 'Track')
+                ]),
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.all(12),
+                height: 100,
+                width: 300,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey.shade100,
+                ),
+                child: Text('Loading...'),
+              );
+            }
+          }),
+    );
   }
 
   @override
@@ -85,7 +157,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                 'To get started, search for sellers via the search function or through the map.\n\nCommunicate with sellers through chats.\n\nView your orders through the orders tab.',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
-            )
+            ),
+            Expanded(child: _buildSellerList()),
           ],
         ),
         bottomNavigationBar: CustomBottomNavigationBar(

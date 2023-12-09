@@ -2,6 +2,7 @@ import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/auth%20pages/auth_page.dart';
 import 'package:fish_cab/home%20pages/chats_screen.dart';
 import 'package:fish_cab/home%20pages/home_page.dart';
+import 'package:fish_cab/home%20pages/map_ongoing.dart';
 import 'package:fish_cab/home%20pages/map_page.dart';
 import 'package:fish_cab/home%20pages/notifications_screen.dart';
 import 'package:fish_cab/home%20pages/order_screen.dart';
@@ -57,6 +58,9 @@ class MyApp extends StatelessWidget {
           '/home': (context) => HomePage(),
           '/search': (context) => SearchScreen(),
           '/map': (context) => MapPage(),
+          '/map_ongoing': (context) => MapOngoingPage(
+                sellerId: '',
+              ),
           '/chats': (context) => ChatsScreen(),
           '/orders': (context) => OrdersScreen(),
           '/notifications': (context) => NotificationsScreen(),
