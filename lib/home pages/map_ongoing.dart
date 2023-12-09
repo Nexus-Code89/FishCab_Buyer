@@ -202,6 +202,8 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
                   markers.add(marker_seller);
                   allMarkers = markers;
 
+                  getPolyPoints();
+
                   return GoogleMap(
                     mapType: MapType.terrain,
                     initialCameraPosition: CameraPosition(
