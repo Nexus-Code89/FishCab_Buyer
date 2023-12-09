@@ -1,28 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
-import 'package:fish_cab/seller_side/seller_fish_demand_options_page.dart';
 import 'package:flutter/material.dart';
 
-class FishOptionsPage extends StatelessWidget {
+class FishDemandOptionsPage extends StatelessWidget {
   final String sellerId;
 
-  FishOptionsPage({required this.sellerId});
+  FishDemandOptionsPage({required this.sellerId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70.0),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20.0, left: 10.0),
-          child: AppBar(
-            title: Text("Fish Options"),
-            backgroundColor: Colors.white,
-            shadowColor: Colors.transparent,
-            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
-          ),
-        ),
+      appBar: AppBar(
+        title: Text('Fish Demand Options Page'),
       ),
       body: Column(
         children: [
@@ -36,22 +26,8 @@ class FishOptionsPage extends StatelessWidget {
               children: [
                 FloatingActionButton(
                   onPressed: () {
-                    // Navigate to FishDemandOptionsPage
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FishDemandOptionsPage(sellerId: sellerId),
-                      ),
-                    );
-                  },
-                  tooltip: 'Demand',
-                  child: Icon(Icons.article),
-                ),
-                  SizedBox(width: 16), // Add some space between buttons
-                FloatingActionButton(
-                  onPressed: () {
                     // Navigate to AddFishOptionPage
-                    Navigator.pushNamed(context, '/add_fish_option', arguments: sellerId);
+                    Navigator.pushNamed(context, '/add_fish_demand_option', arguments: sellerId);
                   },
                   tooltip: 'Add Fish Option',
                   child: Icon(Icons.add),
@@ -101,7 +77,7 @@ class FishOptionsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('seller_info').doc(sellerId).collection('fish_choices').snapshots(),
+      stream: FirebaseFirestore.instance.collection('seller_info').doc(sellerId).collection('fish_demand_choices').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _buildErrorWidget(snapshot.error.toString());
