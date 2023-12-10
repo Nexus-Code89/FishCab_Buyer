@@ -75,11 +75,11 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                 ),
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                   Text(sellerName),
-                  MyButton(
-                      onTap: () {
+                  ElevatedButton(
+                      onPressed: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
                       },
-                      text: 'Track')
+                      child: Text('Track'))
                 ]),
               );
             } else {
