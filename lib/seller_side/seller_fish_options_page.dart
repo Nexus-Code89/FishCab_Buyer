@@ -18,14 +18,19 @@ class FishOptionsPage extends StatelessWidget {
           padding: const EdgeInsets.only(top: 20.0, left: 10.0),
           child: AppBar(
             title: Text("Fish Options"),
+            titleSpacing: 20,
             backgroundColor: Colors.white,
             shadowColor: Colors.transparent,
-            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+            titleTextStyle:
+                const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
           ),
         ),
       ),
       body: Column(
         children: [
+          const SizedBox(
+            height: 10,
+          ),
           Expanded(
             child: FishOptionsList(),
           ),
@@ -47,7 +52,7 @@ class FishOptionsPage extends StatelessWidget {
                   tooltip: 'Demand',
                   child: Icon(Icons.article),
                 ),
-                  SizedBox(width: 16), // Add some space between buttons
+                SizedBox(width: 16), // Add some space between buttons
                 FloatingActionButton(
                   onPressed: () {
                     // Navigate to AddFishOptionPage
@@ -141,33 +146,48 @@ class FishOptionsList extends StatelessWidget {
           final photoUrl = fishOptionData['photoUrl'] as String?;
           final fishName = fishOptionData['fishName'] as String?;
           final price = fishOptionData['price'] as num?;
-
-          return Card(
-            elevation: 3,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(photoUrl ?? ''),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              height: 90,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 3,
+                    blurRadius: 3,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
               ),
-              title: Text(
-                fishName ?? '',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: ListTile(
+                leading: CircleAvatar(
+                  radius: 30,
+                  backgroundImage: NetworkImage(photoUrl ?? ''),
+                ),
+                title: Text(
+                  fishName ?? '',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Montserrat'),
+                ),
+                subtitle: Text(
+                  '\$$price',
+                  style: TextStyle(fontSize: 16),
+                ),
+                trailing: IconButton(
+                  icon: Icon(
+                    Icons.delete_rounded,
+                    size: 30,
+                  ),
+                  hoverColor: Colors.blue,
+                  onPressed: () {
+                    // Call a function to delete the fish option
+                    _deleteFishOption(fishChoices[index].reference);
+                  },
+                ),
               ),
-              subtitle: Text(
-                '\$$price',
-                style: TextStyle(fontSize: 16),
-              ),
-              trailing: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  // Call a function to delete the fish option
-                  _deleteFishOption(fishChoices[index].reference);
-                },
-              ),
-              onTap: () {
-                // TODO: Handle tap on fish option
-              },
             ),
           );
         }

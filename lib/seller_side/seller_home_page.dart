@@ -68,93 +68,176 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
         }
       },
       child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(70.0),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20.0, left: 10.0),
-            child: AppBar(
-              title: Text("Home"),
-              backgroundColor: Colors.white,
-              shadowColor: Colors.transparent,
-              titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
-              actions: [
-                IconButton(
-                  onPressed: () => signUserOut(context), // Pass the context to the function
-                  icon: const Icon(Icons.logout, color: Colors.blue),
-                ),
-              ],
-            ),
-          ),
-        ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            StreamBuilder(
-              stream: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Padding(
-                    padding: const EdgeInsets.all(25.0),
-                    child: Text(
-                      '${"Welcome, " + snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName']}!',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                  );
-                } else {
-                  return const Text('Loading...');
-                }
-              },
-            ),
-            // placeholder text
-            const Padding(
-              padding: EdgeInsets.all(25.0),
-              child: Text(
-                'To get started, set up your fish options.\n\nYou can modify your route & schedule time through the schedule tab.\n\nCommunicate with buyers through chats.',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            SafeArea(
+              child: Container(
+                color: Colors.blue[300],
+                height: 150,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => signUserOut(context), // Pass the context to the function
+                            icon: const Icon(Icons.logout, color: Colors.white),
+                          ),
+                          FutureBuilder(
+                            future: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                  child: Text(
+                                    snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName'],
+                                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, fontFamily: 'Montserrat'),
+                                  ),
+                                );
+                              } else {
+                                return const Text(
+                                  'Loading...',
+                                  style: TextStyle(fontFamily: 'Montserrat'),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      Container(
+                          width: 450,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                spreadRadius: 5,
+                                blurRadius: 5,
+                                offset: Offset(0, 0), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                          child: TextButton(
+                            onPressed: () async {
+                              routeStarted = true;
+
+                              await _firestore
+                                  .collection('seller_info')
+                                  .doc(user?.uid)
+                                  .set({'routeStarted': true}, SetOptions(merge: true));
+
+                              QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
+                                  .collection("orders")
+                                  .where("sellerID", isEqualTo: user?.uid)
+                                  .where("isConfirmed", isEqualTo: "unconfirmed")
+                                  .get();
+
+                              if (querySnapshot_Orders.size != 0) {
+                                List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+                                List<String> buyers = [];
+
+                                for (var data in buyersData) {
+                                  buyers.add(data["userID"]);
+                                }
+
+                                QuerySnapshot querySnapshot_Tokens = await FirebaseFirestore.instance
+                                    .collection("tokens")
+                                    .where(FieldPath.documentId, whereIn: buyers)
+                                    .get();
+
+                                List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
+
+                                DocumentSnapshot currentUserDataSnapshot =
+                                    await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
+
+                                for (var data in allData) {
+                                  FirebaseApi().sendPushMessage(
+                                      "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
+                                      "Fresh fish is on its way!",
+                                      data!['token']!);
+                                }
+                              }
+
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => SellerMapPage()));
+                            },
+                            child: Text("Start Route",
+                                style: TextStyle(
+                                    color: Colors.blue, fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15)),
+                          )),
+                    ],
+                  ),
+                ),
               ),
             ),
-
-            // start route button
-            ElevatedButton(
-                style: ButtonStyle(minimumSize: MaterialStateProperty.all(Size(200, 80))),
-                onPressed: () async {
-                  routeStarted = true;
-
-                  await _firestore.collection('seller_info').doc(user?.uid).set({'routeStarted': true}, SetOptions(merge: true));
-
-                  QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
-                      .collection("orders")
-                      .where("sellerID", isEqualTo: user?.uid)
-                      .where("isConfirmed", isEqualTo: "unconfirmed")
-                      .get();
-
-                  if (querySnapshot_Orders.size != 0) {
-                    List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
-                    List<String> buyers = [];
-
-                    for (var data in buyersData) {
-                      buyers.add(data["userID"]);
-                    }
-
-                    QuerySnapshot querySnapshot_Tokens =
-                        await FirebaseFirestore.instance.collection("tokens").where(FieldPath.documentId, whereIn: buyers).get();
-
-                    List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
-
-                    DocumentSnapshot currentUserDataSnapshot =
-                        await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
-
-                    for (var data in allData) {
-                      FirebaseApi().sendPushMessage(
-                          "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
-                          "Fresh fish is on its way!",
-                          data!['token']!);
-                    }
-                  }
-
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => SellerMapPage()));
-                },
-                child: Text('Start Route', style: TextStyle(fontSize: 20, fontFamily: 'Montserrat'))),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.grey.shade100,
+              ),
+              padding: EdgeInsets.all(30),
+              width: 350,
+              child: const Column(
+                children: [
+                  Text(
+                    'Welcome to Fish Cab!',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Montserrat',
+                      color: Colors.blue,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'To get started, set up your fish options and schedule.\n\nCommunicate through chats and view orders through the orders tab.',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                    'lib/images/fish_options.png',
+                  ),
+                  fit: BoxFit.contain,
+                  alignment: Alignment.centerRight,
+                  opacity: 0.2,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.grey.shade100,
+              ),
+              padding: EdgeInsets.all(30),
+              width: 350,
+              child: Column(
+                children: [
+                  Text(
+                    'Edit your fish options',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Montserrat',
+                      color: Colors.blue,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Let customers know what\'s up for sale',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
         bottomNavigationBar: SellerNavBar(

@@ -38,7 +38,6 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
               }, // Pass the context to the function
               icon: Icon(Icons.arrow_back, color: Colors.blue),
             ),
-            actions: [],
           ),
         ),
       ),

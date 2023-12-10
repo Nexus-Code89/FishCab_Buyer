@@ -11,7 +11,7 @@ class SellerNavBar extends StatelessWidget {
     return BottomNavigationBar(
       items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: Icon(Icons.home_rounded),
           label: 'Home',
         ),
         BottomNavigationBarItem(
@@ -31,8 +31,11 @@ class SellerNavBar extends StatelessWidget {
           label: 'Order',
         ),
       ],
-      selectedLabelStyle: TextStyle(color: Colors.blue),
-      unselectedLabelStyle: TextStyle(color: Colors.grey),
+      // selectedLabelStyle: TextStyle(color: Colors.blue),
+      // unselectedLabelStyle: TextStyle(color: Colors.grey),
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+      iconSize: 30,
       type: BottomNavigationBarType.fixed,
       selectedItemColor: Colors.blue,
       unselectedItemColor: Colors.grey,

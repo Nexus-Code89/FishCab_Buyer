@@ -217,7 +217,7 @@ class _SearchViewState extends State<SearchView> {
                             // backgroundImage: NetworkImage(fishData['photoUrl']),
                           ),
                           title: Text(fishData['fishName']),
-                          subtitle: Text('Seller: $sellerName | Price: \$${fishData['price']}'),
+                          subtitle: Text('Seller: $sellerName | Price: P${fishData['price']}'),
                         );
                       },
                     );
