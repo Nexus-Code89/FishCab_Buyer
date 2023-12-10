@@ -1,6 +1,6 @@
 import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/auth%20pages/auth_page.dart';
-import 'package:fish_cab/home%20pages/chats_screen.dart';
+import 'package:fish_cab/home%20pages/chats_screen_mvc.dart';
 import 'package:fish_cab/home%20pages/home_page.dart';
 import 'package:fish_cab/home%20pages/map_ongoing.dart';
 import 'package:fish_cab/home%20pages/map_page.dart';
@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
           '/map_ongoing': (context) => MapOngoingPage(
                 sellerId: '',
               ),
-          '/chats': (context) => ChatsScreen(),
+          '/chats': (context) => ChatScreen(),
           '/orders': (context) => OrdersScreen(),
           '/notifications': (context) => NotificationsScreen(),
           '/seller_home_view': (context) => SellerHomeScreen(
@@ -87,7 +87,9 @@ class MyApp extends StatelessWidget {
           '/seller_schedule': (context) => SellerSchedulePage(
                 sellerId: SellerSingleton.instance.userId,
               ),
-          '/seller_demand': (context) => SellerDemandPage(sellerID: SellerSingleton.instance.userId,),
+          '/seller_demand': (context) => SellerDemandPage(
+                sellerID: SellerSingleton.instance.userId,
+              ),
           '/seller_home': (context) => SellerHomePage(),
           '/seller_chats': (context) => SellerChatsScreen(),
           '/seller_set_route': (context) => SellerSetRoute(),
