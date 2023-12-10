@@ -17,6 +17,14 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   final User? user = FirebaseAuth.instance.currentUser;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<String> sellers = [];
+  bool _isLoaded = false;
+
+  @override
+  void initState() {
+    getSellerList();
+    super.initState();
+  }
 
   // sign user out method
   void signUserOut(BuildContext context) {
@@ -25,6 +33,25 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     }).catchError((error) {
       // Handle error, if any
       print("Error signing out: $error");
+    });
+  }
+
+  getSellerList() async {
+    QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
+        .collection("orders")
+        .where("userID", isEqualTo: user?.uid)
+        .where("isConfirmed", isEqualTo: "unconfirmed")
+        .get();
+
+    List<dynamic> orderData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+    List<String> sellerData = [];
+    for (var data in orderData) {
+      sellerData.add(data["sellerID"]);
+    }
+
+    setState(() {
+      sellers = sellerData;
+      _isLoaded = true;
     });
   }
 
@@ -47,53 +74,57 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   }
 
   Widget _buildSellerItem(DocumentSnapshot document) {
-    return Container(
-      // TO DO: change email to name
-      alignment: Alignment.center,
-      child: FutureBuilder(
-          future: FirebaseFirestore.instance.collection('users').doc(document.id).get(),
-          builder: (context, snapshot) {
-            String sellerName = '';
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError || snapshot.data == null) {
-                return const Center(
-                  child: Text('Error loading user data'),
+    if (sellers.contains(document.id)) {
+      return Container(
+        // TO DO: change email to name
+        alignment: Alignment.center,
+        child: FutureBuilder(
+            future: FirebaseFirestore.instance.collection('users').doc(document.id).get(),
+            builder: (context, snapshot) {
+              String sellerName = '';
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError || snapshot.data == null) {
+                  return const Center(
+                    child: Text('Error loading user data'),
+                  );
+                } else {
+                  Map<String, dynamic> sellerData = snapshot.data!.data() as Map<String, dynamic>;
+                  sellerName = sellerData['firstName'] + ' ' + sellerData['lastName']; // Get type
+                }
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  height: 100,
+                  width: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.shade100,
+                  ),
+                  child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                    Text(sellerName),
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
+                        },
+                        child: const Text('Track'))
+                  ]),
                 );
               } else {
-                Map<String, dynamic> sellerData = snapshot.data!.data() as Map<String, dynamic>;
-                sellerName = sellerData['firstName'] + ' ' + sellerData['lastName']; // Get type
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  height: 100,
+                  width: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.shade100,
+                  ),
+                  child: const Text('Loading...'),
+                );
               }
-              return Container(
-                padding: const EdgeInsets.all(12),
-                height: 100,
-                width: 300,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey.shade100,
-                ),
-                child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                  Text(sellerName),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
-                      },
-                      child: const Text('Track'))
-                ]),
-              );
-            } else {
-              return Container(
-                padding: const EdgeInsets.all(12),
-                height: 100,
-                width: 300,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey.shade100,
-                ),
-                child: const Text('Loading...'),
-              );
-            }
-          }),
-    );
+            }),
+      );
+    }
+
+    return SizedBox.shrink();
   }
 
   @override
@@ -161,7 +192,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                   Navigator.pushReplacementNamed(context, '/chatmvc');
                 },
                 child: const Text('Chat screen mvc test')),
-            Expanded(child: _buildSellerList()),
+            _isLoaded ? Expanded(child: _buildSellerList()) : Text("Loading"),
           ],
         ),
         bottomNavigationBar: CustomBottomNavigationBar(

@@ -31,14 +31,18 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // map and location-related variables
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   LatLng? _currentPosition;
   LatLng basePosition = LatLng(10.30943566786076, 123.88635816441766);
-  bool _isLoading = true;
   List<LatLng> polylineCoordinates = [];
   StreamSubscription? positionStream;
   late Set<Marker> allMarkers;
+
+  // conditional variables
   bool isNotified = false;
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -47,67 +51,7 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
     });
   }
 
-  // @override
-  // void dispose() {
-  //   positionStream!.cancel();
-
-  //   // TODO: implement dispose
-  //   super.dispose();
-  // }
-
-  // get current user location
-  // getUserLocation() async {
-  //   LocationPermission permission;
-  //   LocationSettings locationSettings;
-  //   await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((Position position) async {
-  //     LatLng location = LatLng(position.latitude, position.longitude);
-  //     await _firestore
-  //         .collection('seller_info')
-  //         .doc(_firebaseAuth.currentUser?.uid)
-  //         .set({'loc_current': new GeoPoint(location.latitude, location.longitude)}, SetOptions(merge: true)).then((value) {
-  //       setState(() {
-  //         _currentPosition = location;
-  //         _isLoading = false;
-  //       });
-  //     });
-  //   });
-
-  //   permission = await Geolocator.requestPermission();
-  //   if (defaultTargetPlatform == TargetPlatform.android) {
-  //     locationSettings = AndroidSettings(
-  //       accuracy: LocationAccuracy.high,
-  //       forceLocationManager: true,
-  //     );
-  //   } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
-  //     locationSettings = AppleSettings(
-  //       accuracy: LocationAccuracy.high,
-  //       activityType: ActivityType.fitness,
-  //       distanceFilter: 50,
-  //       pauseLocationUpdatesAutomatically: true,
-  //       // Only set to true if our app will be started up in the background.
-  //       showBackgroundLocationIndicator: false,
-  //     );
-  //   } else {
-  //     locationSettings = const LocationSettings(
-  //       accuracy: LocationAccuracy.high,
-  //       distanceFilter: 50,
-  //     );
-  //   }
-
-  //   positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
-  //     LatLng location = LatLng(position!.latitude, position.longitude);
-  //     await _firestore.collection('seller_info').doc(_firebaseAuth.currentUser?.uid).get().then((value) {
-  //       myDoc.data
-  //       setState(() {
-  //         _currentPosition = location;
-  //         _isLoading = false;
-  //       });
-  //     });
-  //   });
-  // }
-
   notifTest(Marker marker) async {
-    print("KEKEKEKEKEKEKEKEKEKEKEKKEKEKE");
     getLocation();
     double seller_lat = marker.position.latitude;
     double seller_long = marker.position.longitude;

@@ -121,32 +121,35 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
                   routeStarted = true;
 
                   await _firestore.collection('seller_info').doc(user?.uid).set({'routeStarted': true}, SetOptions(merge: true));
+
                   QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
                       .collection("orders")
                       .where("sellerID", isEqualTo: user?.uid)
                       .where("isConfirmed", isEqualTo: "unconfirmed")
                       .get();
 
-                  List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
-                  List<String> buyers = [];
+                  if (querySnapshot_Orders.size != 0) {
+                    List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+                    List<String> buyers = [];
 
-                  for (var data in buyersData) {
-                    buyers.add(data["userID"]);
-                  }
+                    for (var data in buyersData) {
+                      buyers.add(data["userID"]);
+                    }
 
-                  QuerySnapshot querySnapshot_Tokens =
-                      await FirebaseFirestore.instance.collection("tokens").where(FieldPath.documentId, whereIn: buyers).get();
+                    QuerySnapshot querySnapshot_Tokens =
+                        await FirebaseFirestore.instance.collection("tokens").where(FieldPath.documentId, whereIn: buyers).get();
 
-                  List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
+                    List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
 
-                  DocumentSnapshot currentUserDataSnapshot =
-                      await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
+                    DocumentSnapshot currentUserDataSnapshot =
+                        await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
 
-                  for (var data in allData) {
-                    FirebaseApi().sendPushMessage(
-                        "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
-                        "Fresh fish is on its way!",
-                        data!['token']!);
+                    for (var data in allData) {
+                      FirebaseApi().sendPushMessage(
+                          "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
+                          "Fresh fish is on its way!",
+                          data!['token']!);
+                    }
                   }
 
                   Navigator.push(context, MaterialPageRoute(builder: (context) => SellerMapPage()));
