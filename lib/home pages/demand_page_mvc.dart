@@ -117,7 +117,6 @@ class DemandController {
   }
 }
 
-
 class DemandPage extends StatefulWidget {
   final DemandController controller;
   final sellerID;
@@ -140,7 +139,6 @@ class DemandPage extends StatefulWidget {
   State<DemandPage> createState() => _DemandPageState();
 }
 
-
 class _DemandPageState extends State<DemandPage> {
   late DateTime _selectedDate;
 
@@ -151,54 +149,55 @@ class _DemandPageState extends State<DemandPage> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Demand Page'),
-      centerTitle: true,
-    ),
-    body: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            Text('Selected Date:'),
-            SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: () => _selectDate(context),
-              child: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
-            ),
-          ],
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: widget.controller.demandStorage.demandItems.length,
-            itemBuilder: (context, index) {
-              DemandItem item = widget.controller.demandStorage.demandItems[index];
-
-              return Card(
-                elevation: 3,
-                margin: EdgeInsets.all(8),
-                child: ListTile(
-                  title: Text(
-                    '${item.fishName}',
-                    style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      // Show confirmation dialog before deleting
-                      showDeleteConfirmationDialog(context, index);
-                    },
-                  ),
-                ),
-              );
-            },
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Demand Page'),
+        centerTitle: true,
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Text('Selected Date:'),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () => _selectDate(context),
+                child: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
+              ),
+            ],
           ),
-        ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: widget.controller.demandStorage.demandItems.length,
+              itemBuilder: (context, index) {
+                DemandItem item = widget.controller.demandStorage.demandItems[index];
+
+                return Card(
+                  elevation: 3,
+                  margin: EdgeInsets.all(8),
+                  child: ListTile(
+                    title: Text(
+                      '${item.fishName}',
+                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        // Show confirmation dialog before deleting
+                        showDeleteConfirmationDialog(context, index);
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
           ElevatedButton(
             onPressed: () async {
-              if (await widget.controller.demandExists(widget.controller.getUserId, widget.controller.getSellerId, _selectedDate)) {
+              if (await widget.controller
+                  .demandExists(widget.controller.getUserId, widget.controller.getSellerId, _selectedDate)) {
                 showExistingDemandPrompt(context);
                 return;
               } else if (widget.controller.demandStorage != null && widget.controller.demandStorage.demandItems.isNotEmpty) {
@@ -219,11 +218,12 @@ Widget build(BuildContext context) {
     final DateTime lastSelectableDate = currentDate.add(Duration(days: 30));
 
     final DateTime picked = (await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: currentDate, 
-      lastDate: lastSelectableDate,
-    )) ?? _selectedDate;
+          context: context,
+          initialDate: _selectedDate,
+          firstDate: currentDate,
+          lastDate: lastSelectableDate,
+        )) ??
+        _selectedDate;
 
     if (picked != _selectedDate) {
       setState(() {

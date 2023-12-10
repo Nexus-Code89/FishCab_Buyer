@@ -52,6 +52,7 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
   }
 
   notifTest(Marker marker) async {
+    print("WHAT THE HELL?????");
     getLocation();
     double seller_lat = marker.position.latitude;
     double seller_long = marker.position.longitude;
@@ -64,12 +65,12 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
     );
     DocumentSnapshot data = await FirebaseFirestore.instance.collection("tokens").doc(_firebaseAuth.currentUser!.uid).get();
 
-    if (distance <= 50) {
-      FirebaseApi().sendPushMessage("Seller is arriving!", "Fresh fish is here!", data!['token']);
+    if (distance <= 50 && !isNotified) {
       isNotified = true;
+      FirebaseApi().sendPushMessage("Seller is arriving!", "Fresh fish is here!", data!['token']);
+    } else {
+      isNotified = false;
     }
-
-    isNotified = false;
   }
 
   // get address of place from coordinates

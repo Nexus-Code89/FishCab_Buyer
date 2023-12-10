@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/components/my_button.dart';
 import 'package:fish_cab/home%20pages/bottom_navigation_bar.dart';
 import 'package:fish_cab/home%20pages/map_ongoing.dart';
+import 'package:fish_cab/home%20pages/search_screen_mvc.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,14 +18,6 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   final User? user = FirebaseAuth.instance.currentUser;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<String> sellers = [];
-  bool _isLoaded = false;
-
-  @override
-  void initState() {
-    getSellerList();
-    super.initState();
-  }
 
   // sign user out method
   void signUserOut(BuildContext context) {
@@ -33,25 +26,6 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     }).catchError((error) {
       // Handle error, if any
       print("Error signing out: $error");
-    });
-  }
-
-  getSellerList() async {
-    QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
-        .collection("orders")
-        .where("userID", isEqualTo: user?.uid)
-        .where("isConfirmed", isEqualTo: "unconfirmed")
-        .get();
-
-    List<dynamic> orderData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
-    List<String> sellerData = [];
-    for (var data in orderData) {
-      sellerData.add(data["sellerID"]);
-    }
-
-    setState(() {
-      sellers = sellerData;
-      _isLoaded = true;
     });
   }
 
@@ -69,62 +43,61 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
 
           return ListView(
             children: snapshot.data!.docs.map((document) => _buildSellerItem(document)).toList(),
+            scrollDirection: Axis.horizontal,
           );
         });
   }
 
   Widget _buildSellerItem(DocumentSnapshot document) {
-    if (sellers.contains(document.id)) {
-      return Container(
-        // TO DO: change email to name
-        alignment: Alignment.center,
-        child: FutureBuilder(
-            future: FirebaseFirestore.instance.collection('users').doc(document.id).get(),
-            builder: (context, snapshot) {
-              String sellerName = '';
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError || snapshot.data == null) {
-                  return const Center(
-                    child: Text('Error loading user data'),
-                  );
-                } else {
-                  Map<String, dynamic> sellerData = snapshot.data!.data() as Map<String, dynamic>;
-                  sellerName = sellerData['firstName'] + ' ' + sellerData['lastName']; // Get type
-                }
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  height: 100,
-                  width: 300,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.grey.shade100,
-                  ),
-                  child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                    Text(sellerName),
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
-                        },
-                        child: const Text('Track'))
-                  ]),
+    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+    return Container(
+      // TO DO: change email to name
+      alignment: Alignment.center,
+      child: FutureBuilder(
+          future: FirebaseFirestore.instance.collection('users').doc(document.id).get(),
+          builder: (context, snapshot) {
+            String sellerName = '';
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError || snapshot.data == null) {
+                return Center(
+                  child: Text('Error loading user data'),
                 );
               } else {
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  height: 100,
-                  width: 300,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.grey.shade100,
-                  ),
-                  child: const Text('Loading...'),
-                );
+                Map<String, dynamic> sellerData = snapshot.data!.data() as Map<String, dynamic>;
+                sellerName = sellerData['firstName'] + ' ' + sellerData['lastName']; // Get type
               }
-            }),
-      );
-    }
-
-    return SizedBox.shrink();
+              return Container(
+                padding: const EdgeInsets.all(12),
+                height: 100,
+                width: 300,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey.shade100,
+                ),
+                child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                  Text(sellerName),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
+                      },
+                      child: Text('Track'))
+                ]),
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.all(12),
+                height: 100,
+                width: 300,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey.shade100,
+                ),
+                child: Text('Loading...'),
+              );
+            }
+          }),
+    );
   }
 
   @override
@@ -144,11 +117,11 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
       },
       child: Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(70.0),
+          preferredSize: Size.fromHeight(70.0),
           child: Padding(
             padding: const EdgeInsets.only(top: 20.0, left: 10.0),
             child: AppBar(
-              title: const Text("Home"),
+              title: Text("Home"),
               backgroundColor: Colors.white,
               shadowColor: Colors.transparent,
               titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
@@ -164,6 +137,27 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            TextField(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/search');
+              },
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.search_outlined),
+                  prefixIconColor: Colors.grey[400],
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color.fromARGB(255, 232, 232, 232)),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  fillColor: Colors.grey.shade100,
+                  filled: true,
+                  hintText: 'Search for something...',
+                  hintStyle:
+                      TextStyle(color: Colors.grey[400], fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15)),
+            ),
             FutureBuilder(
               future: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get(),
               builder: (context, snapshot) {
@@ -180,19 +174,14 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                 }
               },
             ),
-            const Padding(
-              padding: EdgeInsets.all(25.0),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
               child: Text(
                 'To get started, search for sellers via the search function or through the map.\n\nCommunicate with sellers through chats.\n\nView your orders through the orders tab.',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
-            TextButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/chatmvc');
-                },
-                child: const Text('Chat screen mvc test')),
-            _isLoaded ? Expanded(child: _buildSellerList()) : Text("Loading"),
+            Expanded(child: _buildSellerList()),
           ],
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
