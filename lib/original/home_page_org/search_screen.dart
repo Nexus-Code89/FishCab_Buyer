@@ -5,12 +5,12 @@ import 'package:fish_cab/home%20pages/bottom_navigation_bar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreens extends StatefulWidget {
   @override
   _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClientMixin {
+class _SearchScreenState extends State<SearchScreens> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 

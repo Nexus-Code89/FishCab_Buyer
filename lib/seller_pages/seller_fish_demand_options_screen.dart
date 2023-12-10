@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fish_cab/home%20pages/demand_page.dart';
+import 'package:fish_cab/home%20pages/demand_page_mvc.dart';
 import 'package:fish_cab/model/demand_ballot.dart';
 import 'package:fish_cab/seller_pages/seller_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +16,7 @@ class FishDemandOptionsScreen extends StatefulWidget {
 
 class _FishDemandOptionsScreenState extends State<FishDemandOptionsScreen> {
   DemandStorage mydemandStorage = DemandStorage();
+  DemandController controller = DemandController();
   late final String userId;
   late FirebaseAuth _firebaseAuth; // Declare _firebaseAuth as a late variable
 
@@ -45,7 +46,7 @@ class _FishDemandOptionsScreenState extends State<FishDemandOptionsScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DemandPage(demandStorage: mydemandStorage, sellerID: widget.sellerId, userID: userId),
+              builder: (context) => DemandPage(demandStorage: mydemandStorage, sellerID: widget.sellerId, userID: userId, controller: controller),
             ),
           );
         },
@@ -193,7 +194,7 @@ class _FishOptionsListState extends State<FishDemandOptionsList> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Demand Confirmation'),
-          content: Text('Do you want to demand $fishName?'),
+          content: Text('Do you want add $fishName as demand?'),
           actions: [
             TextButton(
               onPressed: () {
