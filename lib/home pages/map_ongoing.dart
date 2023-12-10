@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/seller_pages/seller_profile_view.dart';
 import 'package:fish_cab/seller_side/seller_order_page.dart';
 import 'package:flutter/foundation.dart';
@@ -37,7 +38,7 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
   List<LatLng> polylineCoordinates = [];
   StreamSubscription? positionStream;
   late Set<Marker> allMarkers;
-
+  bool isNotified = false;
   @override
   void initState() {
     super.initState();
@@ -54,6 +55,7 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
   //   super.dispose();
   // }
 
+  // get current user location
   // getUserLocation() async {
   //   LocationPermission permission;
   //   LocationSettings locationSettings;
@@ -104,6 +106,28 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
   //   });
   // }
 
+  notifTest(Marker marker) async {
+    print("KEKEKEKEKEKEKEKEKEKEKEKKEKEKE");
+    getLocation();
+    double seller_lat = marker.position.latitude;
+    double seller_long = marker.position.longitude;
+
+    double distance = await Geolocator.distanceBetween(
+      seller_lat,
+      seller_long,
+      _currentPosition!.latitude,
+      _currentPosition!.longitude,
+    );
+    DocumentSnapshot data = await FirebaseFirestore.instance.collection("tokens").doc(_firebaseAuth.currentUser!.uid).get();
+
+    if (distance <= 50) {
+      FirebaseApi().sendPushMessage("Seller is arriving!", "Fresh fish is here!", data!['token']);
+      isNotified = true;
+    }
+
+    isNotified = false;
+  }
+
   // get address of place from coordinates
   Future<String> getPlaceAddress(double lat, double lng) async {
     final url = Uri.parse(
@@ -111,12 +135,6 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
     final response = await http.get(url);
     return json.decode(response.body)['results'][0]['formatted_address'];
   }
-
-  // get all order markers
-  // getMarkersWithinRadius() async {
-
-  //   return markers;
-  // }
 
   // get current location of device
   getLocation() async {
@@ -200,6 +218,9 @@ class _MapOngoingPageState extends State<MapOngoingPage> with AutomaticKeepAlive
                   );
 
                   markers.add(marker_seller);
+                  if (!isNotified) {
+                    notifTest(marker_seller);
+                  }
                   allMarkers = markers;
 
                   getPolyPoints();
