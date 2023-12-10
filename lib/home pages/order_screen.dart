@@ -86,7 +86,7 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
         },
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 4,
+        currentIndex: 3,
         onTap: (index) {
           // Handle navigation taps based on the index
           switch (index) {
@@ -94,15 +94,12 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
               Navigator.pushReplacementNamed(context, '/home');
               break;
             case 1:
-              Navigator.pushReplacementNamed(context, '/search');
-              break;
-            case 2:
               Navigator.pushReplacementNamed(context, '/map');
               break;
-            case 3:
+            case 2:
               Navigator.pushReplacementNamed(context, '/chats');
               break;
-            case 4:
+            case 3:
               Navigator.pushReplacementNamed(context, '/orders');
               break;
           }

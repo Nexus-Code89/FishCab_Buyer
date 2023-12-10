@@ -42,8 +42,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
           }
 
           return ListView(
-            children: snapshot.data!.docs.map((document) => _buildSellerItem(document)).toList(),
             scrollDirection: Axis.horizontal,
+            children: snapshot.data!.docs.map((document) => _buildSellerItem(document)).toList(),
           );
         });
   }
@@ -60,29 +60,43 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
             String sellerName = '';
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError || snapshot.data == null) {
-                return Center(
+                return const Center(
                   child: Text('Error loading user data'),
                 );
               } else {
                 Map<String, dynamic> sellerData = snapshot.data!.data() as Map<String, dynamic>;
                 sellerName = sellerData['firstName'] + ' ' + sellerData['lastName']; // Get type
               }
-              return Container(
-                padding: const EdgeInsets.all(12),
-                height: 100,
-                width: 300,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey.shade100,
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  height: 100,
+                  width: 150,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 5,
+                        blurRadius: 5,
+                        offset: Offset(0, 0), // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                    Text(
+                      sellerName,
+                      style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
+                        },
+                        child: const Text('Track'))
+                  ]),
                 ),
-                child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                  Text(sellerName),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
-                      },
-                      child: Text('Track'))
-                ]),
               );
             } else {
               return Container(
@@ -91,9 +105,17 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                 width: 300,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey.shade100,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 5,
+                      blurRadius: 5,
+                      offset: Offset(0, 0), // changes position of shadow
+                    ),
+                  ],
                 ),
-                child: Text('Loading...'),
+                child: const Text('Loading...'),
               );
             }
           }),
@@ -116,72 +138,124 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
         }
       },
       child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(70.0),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20.0, left: 10.0),
-            child: AppBar(
-              title: Text("Home"),
-              backgroundColor: Colors.white,
-              shadowColor: Colors.transparent,
-              titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
-              actions: [
-                IconButton(
-                  onPressed: () => signUserOut(context), // Pass the context to the function
-                  icon: const Icon(Icons.logout, color: Colors.blue),
-                ),
-              ],
-            ),
-          ),
-        ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            TextField(
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/search');
-              },
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search_outlined),
-                  prefixIconColor: Colors.grey[400],
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromARGB(255, 232, 232, 232)),
-                    borderRadius: BorderRadius.circular(15),
+            SafeArea(
+              child: Container(
+                color: Colors.blue[300],
+                height: 150,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => signUserOut(context), // Pass the context to the function
+                            icon: const Icon(Icons.logout, color: Colors.white),
+                          ),
+                          FutureBuilder(
+                            future: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                  child: Text(
+                                    snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName'],
+                                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, fontFamily: 'Montserrat'),
+                                  ),
+                                );
+                              } else {
+                                return const Text(
+                                  'Loading...',
+                                  style: TextStyle(fontFamily: 'Montserrat'),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      TextField(
+                        onTap: () {
+                          Navigator.pushReplacementNamed(context, '/search');
+                        },
+                        decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.search_outlined),
+                            prefixIconColor: Colors.grey[400],
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Color.fromARGB(255, 232, 232, 232)),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey.shade200),
+                            ),
+                            fillColor: Colors.grey.shade100,
+                            filled: true,
+                            hintText: 'Search for something...',
+                            hintStyle: TextStyle(
+                                color: Colors.grey[400], fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15)),
+                      ),
+                    ],
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade200),
-                  ),
-                  fillColor: Colors.grey.shade100,
-                  filled: true,
-                  hintText: 'Search for something...',
-                  hintStyle:
-                      TextStyle(color: Colors.grey[400], fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15)),
-            ),
-            FutureBuilder(
-              future: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Padding(
-                    padding: const EdgeInsets.all(25.0),
-                    child: Text(
-                      "Welcome, " + snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName'] + '!',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                  );
-                } else {
-                  return Text('Loading...');
-                }
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Text(
-                'To get started, search for sellers via the search function or through the map.\n\nCommunicate with sellers through chats.\n\nView your orders through the orders tab.',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
               ),
             ),
-            Expanded(child: _buildSellerList()),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.grey.shade100,
+              ),
+              padding: EdgeInsets.all(30),
+              width: 350,
+              child: const Column(
+                children: [
+                  Text(
+                    'Welcome to Fish Cab!',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Montserrat',
+                      color: Colors.blue,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'To get started, search for sellers via the search function or through the map.\n\nCommunicate through chats and view your orders through the orders tab.',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.only(left: 30.0),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  'Sellers En Route',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'Montserrat',
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                ),
+                width: 350,
+                height: 120,
+                child: _buildSellerList()),
           ],
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
@@ -193,15 +267,12 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                 Navigator.pushReplacementNamed(context, '/home');
                 break;
               case 1:
-                Navigator.pushReplacementNamed(context, '/search');
-                break;
-              case 2:
                 Navigator.pushReplacementNamed(context, '/map');
                 break;
-              case 3:
+              case 2:
                 Navigator.pushReplacementNamed(context, '/chats');
                 break;
-              case 4:
+              case 3:
                 Navigator.pushReplacementNamed(context, '/orders');
                 break;
             }

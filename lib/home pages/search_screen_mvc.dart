@@ -26,18 +26,19 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
         child: Padding(
           padding: const EdgeInsets.only(top: 20.0, left: 10.0),
           child: AppBar(
-            title: Text(""),
+            title: Text("Enter a fish or seller name"),
+            titleSpacing: 0,
             backgroundColor: Colors.white,
             shadowColor: Colors.transparent,
-            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/home');
-                }, // Pass the context to the function
-                icon: Icon(Icons.arrow_back, color: Colors.blue),
-              ),
-            ],
+            titleTextStyle:
+                const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18, fontFamily: 'Montserrat'),
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/home');
+              }, // Pass the context to the function
+              icon: Icon(Icons.arrow_back, color: Colors.blue),
+            ),
+            actions: [],
           ),
         ),
       ),
@@ -174,7 +175,7 @@ class _SearchViewState extends State<SearchView> {
                     ),
                     fillColor: Colors.grey.shade100,
                     filled: true,
-                    hintText: 'Search for something...',
+                    hintText: 'Try Bangus, John, etc...',
                     hintStyle:
                         TextStyle(color: Colors.grey[400], fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15)),
               ),

@@ -78,15 +78,12 @@ class _ChatsScreenState extends State<ChatsScreen> with AutomaticKeepAliveClient
               Navigator.pushReplacementNamed(context, '/home');
               break;
             case 1:
-              Navigator.pushReplacementNamed(context, '/search');
-              break;
-            case 2:
               Navigator.pushReplacementNamed(context, '/map');
               break;
-            case 3:
+            case 2:
               Navigator.pushReplacementNamed(context, '/chats');
               break;
-            case 4:
+            case 3:
               Navigator.pushReplacementNamed(context, '/orders');
               break;
           }

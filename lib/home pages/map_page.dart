@@ -160,7 +160,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               },
             ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 2, // Set the default selected index
+        currentIndex: 1, // Set the default selected index
         onTap: (index) {
           // Handle item taps here, based on the index
           switch (index) {
@@ -168,15 +168,12 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               Navigator.pushReplacementNamed(context, '/home');
               break;
             case 1:
-              Navigator.pushReplacementNamed(context, '/search');
-              break;
-            case 2:
               Navigator.pushReplacementNamed(context, '/map');
               break;
-            case 3:
+            case 2:
               Navigator.pushReplacementNamed(context, '/chats');
               break;
-            case 4:
+            case 3:
               Navigator.pushReplacementNamed(context, '/orders');
               break;
           }
