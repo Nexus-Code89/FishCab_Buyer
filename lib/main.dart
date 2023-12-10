@@ -1,6 +1,6 @@
 import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/auth%20pages/auth_page.dart';
-import 'package:fish_cab/home%20pages/chats_screen_mvc.dart';
+import 'package:fish_cab/home%20pages/chat_screen.dart';
 import 'package:fish_cab/home%20pages/home_page.dart';
 import 'package:fish_cab/home%20pages/map_ongoing.dart';
 import 'package:fish_cab/home%20pages/map_page.dart';
