@@ -12,6 +12,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
+import '../review-rating pages/view_reviews_screen.dart';
+
 class SellerMapPage extends StatefulWidget {
   @override
   _SellerMapPageState createState() => _SellerMapPageState();
@@ -259,10 +261,20 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
                         ElevatedButton(
                           onPressed: () {
                             //"Confirm" button press
-                            confirmOrder(order.id);
+                            confirmOrder(order.id, order['userID']);
                             Navigator.pop(context);
                           },
                           child: Text('Confirm'),
+                        ),
+                        SizedBox(width: 16.0), // Add space between status and Confirm button
+                        ElevatedButton(
+                          onPressed: () {
+                            //"Confirm" button press
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: order['userID'])));
+                          },
+                          child: Text('See reviews'),
+
                         ),
                       ],
                     ),
@@ -276,19 +288,18 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
     );
   }
 
-  void confirmOrder(String orderId) {
+  void confirmOrder(String orderId, String userID) {
     FirebaseFirestore.instance.collection('orders').doc(orderId).update({'isConfirmed': 'confirmed'}).then((value) {
       // Order marked as confirmed successfully
       // Show a confirmation message
-      setState(() {});
-      showConfirmationDialog();
+      showConfirmationDialog(userID);
     }).catchError((error) {
       // Handle errors, e.g., show an error message
       print('Error marking order as confirmed: $error');
     });
   }
 
-  void showConfirmationDialog() {
+  void showConfirmationDialog(String uid) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -301,6 +312,13 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
                 Navigator.pop(context); // Close the dialog
               },
               child: Text('OK'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(context, (MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: uid)))); // Close the dialog
+              },
+              child: Text('Rate Buyer'),
             ),
           ],
         );

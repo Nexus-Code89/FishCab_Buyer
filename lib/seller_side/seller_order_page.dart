@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fish_cab/review-rating%20pages/view_reviews_screen.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
 import 'package:flutter/material.dart';
 
@@ -182,10 +183,21 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
                         ElevatedButton(
                           onPressed: () {
                             //"Confirm" button press
-                            confirmOrder(order.id);
+                            confirmOrder(order.id, order['userID']);
                             Navigator.pop(context);
                           },
                           child: Text('Confirm'),
+
+                        ),
+                        SizedBox(width: 16.0), // Add space between status and Confirm button
+                        ElevatedButton(
+                          onPressed: () {
+                            //"Confirm" button press
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: order['userID'])));
+                          },
+                          child: Text('See reviews'),
+
                         ),
                       ],
                     ),
@@ -199,18 +211,18 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
     );
   }
 
-  void confirmOrder(String orderId) {
+  void confirmOrder(String orderId, String userID) {
     FirebaseFirestore.instance.collection('orders').doc(orderId).update({'isConfirmed': 'confirmed'}).then((value) {
       // Order marked as confirmed successfully
       // Show a confirmation message
-      showConfirmationDialog();
+      showConfirmationDialog(userID);
     }).catchError((error) {
       // Handle errors, e.g., show an error message
       print('Error marking order as confirmed: $error');
     });
   }
 
-  void showConfirmationDialog() {
+  void showConfirmationDialog(String uid) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -223,6 +235,13 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
                 Navigator.pop(context); // Close the dialog
               },
               child: Text('OK'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(context, (MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: uid)))); // Close the dialog
+              },
+              child: Text('Rate Buyer'),
             ),
           ],
         );
