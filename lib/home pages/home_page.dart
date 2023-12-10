@@ -18,6 +18,32 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   final User? user = FirebaseAuth.instance.currentUser;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Set<String> sellers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    getSellerList();
+  }
+
+  getSellerList() async {
+    QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
+        .collection("orders")
+        .where("userID", isEqualTo: user?.uid)
+        .where("isConfirmed", isEqualTo: "unconfirmed")
+        .get();
+
+    List<dynamic> orderData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+    Set<String> sellersData = {};
+
+    for (var data in orderData) {
+      sellersData.add(data["sellerID"]);
+    }
+
+    setState(() {
+      sellers = sellersData;
+    });
+  }
 
   // sign user out method
   void signUserOut(BuildContext context) {
@@ -51,28 +77,60 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   Widget _buildSellerItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
-    return Container(
-      // TO DO: change email to name
-      alignment: Alignment.center,
-      child: FutureBuilder(
-          future: FirebaseFirestore.instance.collection('users').doc(document.id).get(),
-          builder: (context, snapshot) {
-            String sellerName = '';
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError || snapshot.data == null) {
-                return const Center(
-                  child: Text('Error loading user data'),
+    if (sellers.contains(document.id)) {
+      return Container(
+        // TO DO: change email to name
+        alignment: Alignment.center,
+        child: FutureBuilder(
+            future: FirebaseFirestore.instance.collection('users').doc(document.id).get(),
+            builder: (context, snapshot) {
+              String sellerName = '';
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError || snapshot.data == null) {
+                  return const Center(
+                    child: Text('Error loading user data'),
+                  );
+                } else {
+                  Map<String, dynamic> sellerData = snapshot.data!.data() as Map<String, dynamic>;
+                  sellerName = sellerData['firstName'] + ' ' + sellerData['lastName']; // Get type
+                }
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    height: 100,
+                    width: 150,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 5,
+                          blurRadius: 5,
+                          offset: Offset(0, 0), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                      Text(
+                        sellerName,
+                        style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
+                          },
+                          child: const Text('Track'))
+                    ]),
+                  ),
                 );
               } else {
-                Map<String, dynamic> sellerData = snapshot.data!.data() as Map<String, dynamic>;
-                sellerName = sellerData['firstName'] + ' ' + sellerData['lastName']; // Get type
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Container(
+                return Container(
                   padding: const EdgeInsets.all(12),
                   height: 100,
-                  width: 150,
+                  width: 300,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.white,
@@ -85,41 +143,14 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                       ),
                     ],
                   ),
-                  child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                    Text(
-                      sellerName,
-                      style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => MapOngoingPage(sellerId: document.id)));
-                        },
-                        child: const Text('Track'))
-                  ]),
-                ),
-              );
-            } else {
-              return Container(
-                padding: const EdgeInsets.all(12),
-                height: 100,
-                width: 300,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 5,
-                      blurRadius: 5,
-                      offset: Offset(0, 0), // changes position of shadow
-                    ),
-                  ],
-                ),
-                child: const Text('Loading...'),
-              );
-            }
-          }),
-    );
+                  child: const Text('Loading...'),
+                );
+              }
+            }),
+      );
+    } else {
+      return SizedBox.shrink();
+    }
   }
 
   @override
