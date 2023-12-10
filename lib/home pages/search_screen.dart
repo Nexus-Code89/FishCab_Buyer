@@ -21,41 +21,49 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
     super.build(context);
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70.0),
+        preferredSize: Size.fromHeight(50.0),
         child: Padding(
           padding: const EdgeInsets.only(top: 20.0, left: 10.0),
           child: AppBar(
-            title: Text("Search"),
+            title: Text(""),
             backgroundColor: Colors.white,
             shadowColor: Colors.transparent,
             titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/home');
+                }, // Pass the context to the function
+                icon: Icon(Icons.arrow_back, color: Colors.blue),
+              ),
+            ],
           ),
         ),
       ),
       body: SearchView(), // Extracted into a separate stateful widget
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 1, // Set the default selected index
-        onTap: (index) {
-          // Handle item taps here, based on the index
-          switch (index) {
-            case 0:
-              Navigator.pushReplacementNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushReplacementNamed(context, '/search');
-              break;
-            case 2:
-              Navigator.pushReplacementNamed(context, '/map');
-              break;
-            case 3:
-              Navigator.pushReplacementNamed(context, '/chats');
-              break;
-            case 4:
-              Navigator.pushReplacementNamed(context, '/orders');
-              break;
-          }
-        },
-      ),
+      // bottomNavigationBar: CustomBottomNavigationBar(
+      //   currentIndex: 1, // Set the default selected index
+      //   onTap: (index) {
+      //     // Handle item taps here, based on the index
+      //     switch (index) {
+      //       case 0:
+      //         Navigator.pushReplacementNamed(context, '/home');
+      //         break;
+      //       case 1:
+      //         Navigator.pushReplacementNamed(context, '/search');
+      //         break;
+      //       case 2:
+      //         Navigator.pushReplacementNamed(context, '/map');
+      //         break;
+      //       case 3:
+      //         Navigator.pushReplacementNamed(context, '/chats');
+      //         break;
+      //       case 4:
+      //         Navigator.pushReplacementNamed(context, '/orders');
+      //         break;
+      //     }
+      //   },
+      // ),
     );
   }
 }
@@ -122,7 +130,7 @@ class _SearchViewState extends State<SearchView> {
                 radius: 24,
                 //backgroundImage: NetworkImage(data['profileUrl']),
               ),
-              title: Text(data['firstName']),
+              title: Text(data['firstName'] + ' ' + data['lastName']),
               subtitle: Text(data['email']),
             );
           },
@@ -324,10 +332,11 @@ class _SearchViewState extends State<SearchView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 120,
+        elevation: 0,
+        toolbarHeight: 110,
         backgroundColor: Colors.white,
         title: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -339,27 +348,31 @@ class _SearchViewState extends State<SearchView> {
                   });
                 },
                 decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(10),
-                    enabledBorder: const OutlineInputBorder(
+                    prefixIcon: Icon(Icons.search_outlined),
+                    prefixIconColor: Colors.grey[400],
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                    enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Color.fromARGB(255, 232, 232, 232)),
+                      borderRadius: BorderRadius.circular(15),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade400),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
                     ),
                     fillColor: Colors.grey.shade100,
                     filled: true,
                     hintText: 'Search for something...',
-                    hintStyle: TextStyle(color: Colors.grey[500], fontFamily: 'Montserrat', fontWeight: FontWeight.bold)),
+                    hintStyle:
+                        TextStyle(color: Colors.grey[400], fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15)),
               ),
 
               const SizedBox(height: 5),
 
               // row of buttons
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   // seller button
-                  ElevatedButton(
+                  TextButton(
                     onPressed: () {
                       setState(() {
                         isSellerSelected = true;
@@ -371,24 +384,30 @@ class _SearchViewState extends State<SearchView> {
                         (Set<MaterialState> states) {
                           if (states.contains(MaterialState.pressed) || isSellerSelected) {
                             // Selected
-                            return Colors.blue;
+                            return Colors.blue.shade200;
                           } else {
                             // Not Selected
-                            return Colors.grey;
+                            return Colors.grey.shade300;
                           }
                         },
                       ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                      ),
                       padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(horizontal: 24, vertical: 5),
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       ),
                     ),
                     child: Text(
                       'Seller',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
                     ),
                   ),
+
+                  const SizedBox(width: 5),
+
                   // fish button
-                  ElevatedButton(
+                  TextButton(
                     onPressed: () {
                       setState(() {
                         isSellerSelected = false;
@@ -400,24 +419,30 @@ class _SearchViewState extends State<SearchView> {
                         (Set<MaterialState> states) {
                           if (states.contains(MaterialState.pressed) || (!isSellerSelected && !isNearbySelected)) {
                             // Sellected
-                            return Colors.blue;
+                            return Colors.blue.shade200;
                           } else {
                             // Not Selected
-                            return Colors.grey;
+                            return Colors.grey.shade300;
                           }
                         },
                       ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                      ),
                       padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(horizontal: 24, vertical: 5),
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       ),
                     ),
                     child: Text(
                       'Fish',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
                     ),
                   ),
+
+                  const SizedBox(width: 5),
+
                   // nearby button
-                  ElevatedButton(
+                  TextButton(
                     onPressed: () {
                       setState(() {
                         isSellerSelected = false;
@@ -429,20 +454,23 @@ class _SearchViewState extends State<SearchView> {
                         (Set<MaterialState> states) {
                           if (states.contains(MaterialState.pressed) || isNearbySelected) {
                             // Sellected
-                            return Colors.blue;
+                            return Colors.blue.shade200;
                           } else {
                             // Not Selected
-                            return Colors.grey;
+                            return Colors.grey.shade300;
                           }
                         },
                       ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                      ),
                       padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(horizontal: 24, vertical: 5),
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       ),
                     ),
                     child: Text(
                       'Nearby',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

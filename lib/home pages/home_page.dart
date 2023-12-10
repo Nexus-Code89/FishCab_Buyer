@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/components/my_button.dart';
 import 'package:fish_cab/home%20pages/bottom_navigation_bar.dart';
 import 'package:fish_cab/home%20pages/map_ongoing.dart';
+import 'package:fish_cab/home%20pages/search_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -42,6 +43,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
 
           return ListView(
             children: snapshot.data!.docs.map((document) => _buildSellerItem(document)).toList(),
+            scrollDirection: Axis.horizontal,
           );
         });
   }
@@ -135,6 +137,27 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            TextField(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/search');
+              },
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.search_outlined),
+                  prefixIconColor: Colors.grey[400],
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color.fromARGB(255, 232, 232, 232)),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  fillColor: Colors.grey.shade100,
+                  filled: true,
+                  hintText: 'Search for something...',
+                  hintStyle:
+                      TextStyle(color: Colors.grey[400], fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15)),
+            ),
             FutureBuilder(
               future: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get(),
               builder: (context, snapshot) {

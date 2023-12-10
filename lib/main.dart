@@ -89,7 +89,9 @@ class MyApp extends StatelessWidget {
           '/seller_schedule': (context) => SellerSchedulePage(
                 sellerId: SellerSingleton.instance.userId,
               ),
-          '/seller_demand': (context) => SellerDemandPage(sellerID: SellerSingleton.instance.userId,),
+          '/seller_demand': (context) => SellerDemandPage(
+                sellerID: SellerSingleton.instance.userId,
+              ),
           '/seller_home': (context) => SellerHomePage(),
           '/seller_chats': (context) => SellerChatsScreen(),
           '/seller_set_route': (context) => SellerSetRoute(),
