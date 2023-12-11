@@ -40,30 +40,7 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
           ),
         ),
       ),
-      body: SearchView(), // Extracted into a separate stateful widget
-      // bottomNavigationBar: CustomBottomNavigationBar(
-      //   currentIndex: 1, // Set the default selected index
-      //   onTap: (index) {
-      //     // Handle item taps here, based on the index
-      //     switch (index) {
-      //       case 0:
-      //         Navigator.pushReplacementNamed(context, '/home');
-      //         break;
-      //       case 1:
-      //         Navigator.pushReplacementNamed(context, '/search');
-      //         break;
-      //       case 2:
-      //         Navigator.pushReplacementNamed(context, '/map');
-      //         break;
-      //       case 3:
-      //         Navigator.pushReplacementNamed(context, '/chats');
-      //         break;
-      //       case 4:
-      //         Navigator.pushReplacementNamed(context, '/orders');
-      //         break;
-      //     }
-      //   },
-      // ),
+      body: SearchView(),
     );
   }
 }
@@ -257,6 +234,7 @@ class _SearchViewState extends State<SearchView> {
 
 // get all users within a certain radius
   getUsersWithinRadius(LatLng center, double radius) async {
+    List<String> users = [];
     final QuerySnapshot querySnapshot =
         await _firestore.collection('seller_info').where('loc_start_address', isNotEqualTo: 'Start Location Not Set').get();
 
@@ -277,8 +255,12 @@ class _SearchViewState extends State<SearchView> {
       if (_distanceInMeters > 500) {
         continue;
       } else {
-        userList.add(userId);
+        users.add(userId);
       }
+
+      setState(() {
+        userList = users;
+      });
     }
   }
 
@@ -298,6 +280,7 @@ class _SearchViewState extends State<SearchView> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Text("Loading");
         }
+
         return ListView.builder(
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
@@ -321,6 +304,8 @@ class _SearchViewState extends State<SearchView> {
                 title: Text(data['firstName']),
                 subtitle: Text(data['email']),
               );
+            } else {
+              return SizedBox.shrink();
             }
           },
         );
@@ -453,7 +438,7 @@ class _SearchViewState extends State<SearchView> {
                       backgroundColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) {
                           if (states.contains(MaterialState.pressed) || isNearbySelected) {
-                            // Sellected
+                            // Selected
                             return Colors.blue.shade200;
                           } else {
                             // Not Selected
