@@ -12,25 +12,15 @@ class FishOptionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70.0),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20.0, left: 10.0),
-          child: AppBar(
-            title: Text("Fish Options"),
-            titleSpacing: 20,
-            backgroundColor: Colors.white,
-            shadowColor: Colors.transparent,
-            titleTextStyle:
-                const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
-          ),
-        ),
+      appBar: AppBar(
+        title: Text("Fish Options"),
+        titleSpacing: 20,
+        backgroundColor: Colors.white,
+        shadowColor: Colors.transparent,
+        titleTextStyle: const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
       ),
       body: Column(
         children: [
-          const SizedBox(
-            height: 10,
-          ),
           Expanded(
             child: FishOptionsList(),
           ),
@@ -65,6 +55,34 @@ class FishOptionsPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: SellerNavBar(
+        currentIndex: 1, // Set the default selected index
+        onTap: (index) {
+          // Handle item taps here, based on the index
+          switch (index) {
+            case 0:
+              // Navigate to Home Page
+              Navigator.pushReplacementNamed(context, '/seller_home');
+              break;
+            case 1:
+              // Navigate to Fish Options Page
+              Navigator.pushReplacementNamed(context, '/seller_fish_options');
+              break;
+            case 2:
+              // Navigate to Schedule Page
+              Navigator.pushReplacementNamed(context, '/seller_schedule');
+              break;
+            case 3:
+              // Navigate to Chats Page
+              Navigator.pushReplacementNamed(context, '/seller_chats');
+              break;
+            case 4:
+              // Navigate to Orders Page
+              Navigator.pushReplacementNamed(context, '/seller_orders');
+              break;
+          }
+        },
       ),
     );
   }
@@ -118,48 +136,33 @@ class FishOptionsList extends StatelessWidget {
           final photoUrl = fishOptionData['photoUrl'] as String?;
           final fishName = fishOptionData['fishName'] as String?;
           final price = fishOptionData['price'] as num?;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              height: 90,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 3,
-                    blurRadius: 3,
-                    offset: Offset(0, 0), // changes position of shadow
-                  ),
-                ],
+
+          return Card(
+            elevation: 3,
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 30,
+                backgroundImage: NetworkImage(photoUrl ?? ''),
               ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(photoUrl ?? ''),
-                ),
-                title: Text(
-                  fishName ?? '',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Montserrat'),
-                ),
-                subtitle: Text(
-                  '\$$price',
-                  style: TextStyle(fontSize: 16),
-                ),
-                trailing: IconButton(
-                  icon: Icon(
-                    Icons.delete_rounded,
-                    size: 30,
-                  ),
-                  hoverColor: Colors.blue,
-                  onPressed: () {
-                    // Call a function to delete the fish option
-                    _deleteFishOption(fishChoices[index].reference);
-                  },
-                ),
+              title: Text(
+                fishName ?? '',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
+              subtitle: Text(
+                '\$$price',
+                style: TextStyle(fontSize: 16),
+              ),
+              trailing: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  // Call a function to delete the fish option
+                  _deleteFishOption(fishChoices[index].reference);
+                },
+              ),
+              onTap: () {
+                // TODO: Handle tap on fish option
+              },
             ),
           );
         }

@@ -16,7 +16,6 @@ class FishDemandOptionsScreen extends StatefulWidget {
 
 class _FishDemandOptionsScreenState extends State<FishDemandOptionsScreen> {
   DemandStorage mydemandStorage = DemandStorage();
-  DemandController controller = DemandController();
   late final String userId;
   late FirebaseAuth _firebaseAuth; // Declare _firebaseAuth as a late variable
 
@@ -46,7 +45,7 @@ class _FishDemandOptionsScreenState extends State<FishDemandOptionsScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DemandPage(demandStorage: mydemandStorage, sellerID: widget.sellerId, userID: userId, controller: controller),
+              builder: (context) => DemandPage(demandStorage: mydemandStorage, sellerID: widget.sellerId, userID: userId),
             ),
           );
         },
@@ -89,7 +88,8 @@ class _FishOptionsListState extends State<FishDemandOptionsList> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('seller_info').doc(widget.sellerId).collection('fish_demand_choices').snapshots(),
+      stream:
+          FirebaseFirestore.instance.collection('seller_info').doc(widget.sellerId).collection('fish_demand_choices').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _buildErrorWidget(snapshot.error.toString());
@@ -194,7 +194,7 @@ class _FishOptionsListState extends State<FishDemandOptionsList> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Demand Confirmation'),
-          content: Text('Do you want add $fishName as demand?'),
+          content: Text('Do you want to demand $fishName?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -217,4 +217,3 @@ class _FishOptionsListState extends State<FishDemandOptionsList> {
     );
   }
 }
-

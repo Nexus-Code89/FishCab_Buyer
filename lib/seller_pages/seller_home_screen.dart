@@ -33,6 +33,12 @@ class SellerHomeScreen extends StatelessWidget {
             return Scaffold(
               appBar: AppBar(
                 title: Text('Seller Profile'),
+                toolbarHeight: 80,
+                titleSpacing: 20,
+                backgroundColor: Colors.white,
+                shadowColor: Colors.transparent,
+                titleTextStyle:
+                    const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
               ),
               body: Padding(
                 padding: const EdgeInsets.all(16.0),

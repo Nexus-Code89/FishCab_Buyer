@@ -25,9 +25,12 @@ class SellerProfileView extends StatelessWidget {
           padding: const EdgeInsets.only(top: 20.0, left: 10.0),
           child: AppBar(
             title: Text("Seller Profile"),
+            toolbarHeight: 80,
+            titleSpacing: 20,
             backgroundColor: Colors.white,
             shadowColor: Colors.transparent,
-            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+            titleTextStyle:
+                const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
           ),
         ),
       ),

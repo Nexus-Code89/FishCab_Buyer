@@ -14,7 +14,7 @@ class DemandStorage {
   }
 
   void removeItem(index) {
-    if(index >= 0 && index < demandItems.length) {
+    if (index >= 0 && index < demandItems.length) {
       demandItems.removeAt(index);
     }
   }

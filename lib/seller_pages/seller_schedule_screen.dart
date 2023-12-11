@@ -18,7 +18,12 @@ class SellerScheduleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Schedules'),
+        title: Text('Schedule & Route'),
+        toolbarHeight: 80,
+        titleSpacing: 20,
+        backgroundColor: Colors.white,
+        shadowColor: Colors.transparent,
+        titleTextStyle: const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -70,7 +75,7 @@ class SellerScheduleScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              snapshot.data!['loc_start_address'] + "  TO  " + snapshot.data!['loc_end_address'],
+                              snapshot.data!['loc_start_address'] + "  ====>  " + snapshot.data!['loc_end_address'],
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                             ),
                             SizedBox(height: 25.0),

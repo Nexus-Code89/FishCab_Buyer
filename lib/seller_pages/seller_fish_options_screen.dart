@@ -32,13 +32,18 @@ class _FishOptionsScreenState extends State<FishOptionsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Fish Options Page'),
+        title: Text('Fish Options'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
+        toolbarHeight: 80,
+        titleSpacing: 20,
+        backgroundColor: Colors.white,
+        shadowColor: Colors.transparent,
+        titleTextStyle: const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
