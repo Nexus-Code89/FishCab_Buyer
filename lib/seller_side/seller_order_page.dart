@@ -75,7 +75,6 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
                     ),
                   );
                 },
-                
               );
             },
           );
@@ -90,26 +89,19 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
         tooltip: 'View Demands', // Optional tooltip for accessibility
       ),
       bottomNavigationBar: SellerNavBar(
-        currentIndex: 4,
+        currentIndex: 2, // Set the default selected index
         onTap: (index) {
+          // Handle item taps here, based on the index
           switch (index) {
             case 0:
-              // Navigate to Home Page
+              // Navigate to Chats Page
               Navigator.pushReplacementNamed(context, '/seller_home');
               break;
             case 1:
-              // Navigate to Fish Options Page
-              Navigator.pushReplacementNamed(context, '/seller_fish_options');
-              break;
-            case 2:
-              // Navigate to Schedule Page
-              Navigator.pushReplacementNamed(context, '/seller_schedule');
-              break;
-            case 3:
               // Navigate to Chats Page
               Navigator.pushReplacementNamed(context, '/seller_chats');
               break;
-            case 4:
+            case 2:
               // Navigate to Orders Page
               Navigator.pushReplacementNamed(context, '/seller_orders');
               break;

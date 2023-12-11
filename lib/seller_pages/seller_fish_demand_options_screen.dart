@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fish_cab/home%20pages/demand_page_mvc.dart';
+import 'package:fish_cab/home%20pages/demand_page.dart';
 import 'package:fish_cab/model/demand_ballot.dart';
 import 'package:fish_cab/seller_pages/seller_navigation_bar.dart';
 import 'package:flutter/material.dart';

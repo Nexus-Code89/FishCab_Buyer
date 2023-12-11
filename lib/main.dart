@@ -6,7 +6,7 @@ import 'package:fish_cab/home%20pages/map_ongoing.dart';
 import 'package:fish_cab/home%20pages/map_page.dart';
 import 'package:fish_cab/home%20pages/notifications_screen.dart';
 import 'package:fish_cab/home%20pages/order_screen.dart';
-import 'package:fish_cab/home%20pages/search_screen_mvc.dart';
+import 'package:fish_cab/home%20pages/search_screen.dart';
 import 'package:fish_cab/review-rating%20pages/make_review_screen.dart';
 import 'package:fish_cab/seller_pages/seller_fish_options_screen.dart';
 import 'package:fish_cab/seller_pages/seller_home_screen.dart';
@@ -50,6 +50,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
+          appBarTheme: AppBarTheme(
+            iconTheme: IconThemeData(
+              color: Colors.blue,
+            ),
+          ),
         ),
         debugShowCheckedModeBanner: false,
         initialRoute: '/auth', // Set the initial route

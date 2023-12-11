@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/components/my_button.dart';
 import 'package:fish_cab/home%20pages/bottom_navigation_bar.dart';
 import 'package:fish_cab/home%20pages/map_ongoing.dart';
-import 'package:fish_cab/home%20pages/search_screen_mvc.dart';
+import 'package:fish_cab/home%20pages/search_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {

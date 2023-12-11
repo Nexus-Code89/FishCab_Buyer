@@ -9,18 +9,10 @@ class SellerNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      items: [
+      items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_rounded),
           label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.local_offer),
-          label: 'Fish Options',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.schedule),
-          label: 'Schedule',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.chat), // Added chat icon

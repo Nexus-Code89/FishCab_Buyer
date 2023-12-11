@@ -43,30 +43,7 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
       ),
       body: SearchView(
         model: model,
-      ), // Extracted into a separate stateful widget
-      // bottomNavigationBar: CustomBottomNavigationBar(
-      //   currentIndex: 1, // Set the default selected index
-      //   onTap: (index) {
-      //     // Handle item taps here, based on the index
-      //     switch (index) {
-      //       case 0:
-      //         Navigator.pushReplacementNamed(context, '/home');
-      //         break;
-      //       case 1:
-      //         Navigator.pushReplacementNamed(context, '/search');
-      //         break;
-      //       case 2:
-      //         Navigator.pushReplacementNamed(context, '/map');
-      //         break;
-      //       case 3:
-      //         Navigator.pushReplacementNamed(context, '/chats');
-      //         break;
-      //       case 4:
-      //         Navigator.pushReplacementNamed(context, '/orders');
-      //         break;
-      //     }
-      //   },
-      // ),
+      ),
     );
   }
 }

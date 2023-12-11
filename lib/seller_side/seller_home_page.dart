@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
+import 'package:fish_cab/seller_side/seller_fish_options_page.dart';
 import 'package:fish_cab/seller_side/seller_map_page.dart';
+import 'package:fish_cab/seller_side/seller_schedule_page.dart';
 import 'package:flutter/material.dart';
 
 class SellerHomePage extends StatefulWidget {
@@ -128,7 +130,6 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
                                   .collection('seller_info')
                                   .doc(user?.uid)
                                   .set({'routeStarted': true}, SetOptions(merge: true));
-
                               QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
                                   .collection("orders")
                                   .where("sellerID", isEqualTo: user?.uid)
@@ -160,7 +161,6 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
                                       data!['token']!);
                                 }
                               }
-
                               Navigator.push(context, MaterialPageRoute(builder: (context) => SellerMapPage()));
                             },
                             child: Text("Start Route",
@@ -204,7 +204,7 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
             const SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
-                image: DecorationImage(
+                image: const DecorationImage(
                   image: AssetImage(
                     'lib/images/fish_options.png',
                   ),
@@ -212,10 +212,18 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
                   alignment: Alignment.centerRight,
                   opacity: 0.2,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 3,
+                    blurRadius: 5,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
                 borderRadius: BorderRadius.circular(20),
-                color: Colors.grey.shade100,
+                color: Colors.white,
               ),
-              padding: EdgeInsets.all(30),
+              padding: EdgeInsets.all(20),
               width: 350,
               child: Column(
                 children: [
@@ -228,12 +236,93 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
                       color: Colors.blue,
                     ),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
                   Text(
                     'Let customers know what\'s up for sale',
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => FishOptionsPage(sellerId: user!.uid)));
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.blue),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                      ),
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      ),
+                    ),
+                    child: Text(
+                      'Fish Options',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                image: const DecorationImage(
+                  image: AssetImage(
+                    'lib/images/fish_options.png',
+                  ),
+                  fit: BoxFit.contain,
+                  alignment: Alignment.centerRight,
+                  opacity: 0.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 3,
+                    blurRadius: 5,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+              ),
+              padding: EdgeInsets.all(20),
+              width: 350,
+              child: Column(
+                children: [
+                  Text(
+                    'Set your schedule',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Montserrat',
+                      color: Colors.blue,
+                    ),
+                  ),
+                  Text(
+                    'Let customers know your route and schedule',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => SellerSchedulePage(sellerId: user!.uid)));
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.blue),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                      ),
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      ),
+                    ),
+                    child: Text(
+                      'Set now',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -246,18 +335,10 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
             // Handle item taps here, based on the index
             switch (index) {
               case 1:
-                // Navigate to Fish Options Page
-                Navigator.pushReplacementNamed(context, '/seller_fish_options');
-                break;
-              case 2:
-                // Navigate to Schedule Page
-                Navigator.pushReplacementNamed(context, '/seller_schedule');
-                break;
-              case 3:
                 // Navigate to Chats Page
                 Navigator.pushReplacementNamed(context, '/seller_chats');
                 break;
-              case 4:
+              case 2:
                 // Navigate to Orders Page
                 Navigator.pushReplacementNamed(context, '/seller_orders');
                 break;
