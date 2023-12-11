@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/home%20pages/bottom_navigation_bar.dart';
+import 'package:fish_cab/review-rating%20pages/make_review_screen.dart';
 import 'package:flutter/material.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -182,9 +183,8 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
             ),
             ElevatedButton(
               onPressed: () {
-                // Handle "Rate" button press
-                // TODO: navigate to a rating screen or show a dialog for rating
                 Navigator.pop(context);
+                Navigator.push(context, (MaterialPageRoute(builder: (context) => ReviewView(reviewee: order['sellerID'])))); // Cl
               },
               child: Text('Rate'),
             ),

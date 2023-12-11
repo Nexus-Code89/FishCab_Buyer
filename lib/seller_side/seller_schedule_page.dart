@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/components/my_button.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
+import 'package:fish_cab/seller_side/seller_set_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +122,7 @@ class _SellerSchedulePageState extends State<SellerSchedulePage> with AutomaticK
                             child: const Text("Change Route",
                                 style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 16, color: Colors.blue)),
                             onPressed: () {
-                              Navigator.pushReplacementNamed(context, '/seller_set_route');
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => SellerSetRoute()));
                             }),
                         Text(
                           DateFormat("h:mma").format(startTime) + ' - ' + DateFormat("h:mma").format(endTime),

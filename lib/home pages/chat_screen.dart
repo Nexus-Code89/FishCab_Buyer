@@ -59,7 +59,8 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ChatsPage(receiverUserEmail: data['email'], receiverUserID: data.id)));
+                                  builder: (context) => ChatsPage(
+                                      receiverName: data['firstName'] + ' ' + data['lastName'], receiverUserID: data.id)));
                         },
                         leading: CircleAvatar(
                           radius: 24,

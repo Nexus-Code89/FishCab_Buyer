@@ -102,7 +102,7 @@ class _SellerChatsPageState extends State<SellerChatsPage> with AutomaticKeepAli
               mainAxisAlignment:
                   (data['senderId'] == _firebaseAuth.currentUser!.uid) ? MainAxisAlignment.end : MainAxisAlignment.start,
               children: [
-                Text(data['senderEmail']),
+                Text(widget.receiverName),
                 const SizedBox(height: 5),
                 (data['senderId'] == _firebaseAuth.currentUser!.uid)
                     ? ChatBubble(message: data['message'], type: 'sender')

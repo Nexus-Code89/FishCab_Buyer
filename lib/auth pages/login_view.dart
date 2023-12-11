@@ -99,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                                           await FirebaseAuth.instance
                                               .sendPasswordResetEmail(email: _loginController.emailController.text)
                                               .then((value) {
-                                            _loginController.showErrorMessage(context, "sent");
+                                            _loginController.showErrorMessage(context, "Password reset email has been set.");
                                           }).onError((error, stackTrace) {
                                             _loginController.showErrorMessage(context, "Error: $error");
                                           });
