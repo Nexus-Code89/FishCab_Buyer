@@ -90,11 +90,13 @@ class _DemandPageState extends State<DemandPage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final DateTime currentDate = DateTime.now();
+    final DateTime lastSelectedDate = currentDate.add(Duration(days: 30));
     final DateTime picked = (await showDatePicker(
           context: context,
           initialDate: _selectedDate,
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2101),
+          firstDate: currentDate,
+          lastDate: lastSelectedDate,
         )) ??
         _selectedDate;
 

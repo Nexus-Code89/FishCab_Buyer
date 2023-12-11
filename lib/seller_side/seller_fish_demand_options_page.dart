@@ -95,32 +95,47 @@ class FishOptionsList extends StatelessWidget {
           final fishName = fishOptionData['fishName'] as String?;
           final price = fishOptionData['price'] as num?;
 
-          return Card(
-            elevation: 3,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(photoUrl ?? ''),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              height: 90,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 3,
+                    blurRadius: 3,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
               ),
-              title: Text(
-                fishName ?? '',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(
-                '\$$price',
-                style: TextStyle(fontSize: 16),
-              ),
-              trailing: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  // Call a function to delete the fish option
-                  _deleteFishOption(fishChoices[index].reference);
+              child: ListTile(
+                leading: CircleAvatar(
+                  radius: 30,
+                  backgroundImage: NetworkImage(photoUrl ?? ''),
+                ),
+                title: Text(
+                  fishName ?? '',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  '\$$price',
+                  style: TextStyle(fontSize: 16),
+                ),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    // Call a function to delete the fish option
+                    _deleteFishOption(fishChoices[index].reference);
+                  },
+                ),
+                onTap: () {
+                  // TODO: Handle tap on fish option
                 },
               ),
-              onTap: () {
-                // TODO: Handle tap on fish option
-              },
             ),
           );
         }
