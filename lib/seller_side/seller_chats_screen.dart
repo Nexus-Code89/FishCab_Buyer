@@ -26,9 +26,12 @@ class _SellerChatsScreenState extends State<SellerChatsScreen> with AutomaticKee
           padding: const EdgeInsets.only(top: 20.0, left: 10.0),
           child: AppBar(
             title: Text("Chats"),
+            toolbarHeight: 80,
+            titleSpacing: 20,
             backgroundColor: Colors.white,
             shadowColor: Colors.transparent,
-            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+            titleTextStyle:
+                const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
           ),
         ),
       ),
@@ -57,8 +60,8 @@ class _SellerChatsScreenState extends State<SellerChatsScreen> with AutomaticKee
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      SellerChatsPage(receiverUserEmail: data['email'], receiverUserID: data.id)));
+                                  builder: (context) => SellerChatsPage(
+                                      receiverName: data['firstName'] + ' ' + data['lastName'], receiverUserID: data.id)));
                         },
                         leading: CircleAvatar(
                           radius: 24,

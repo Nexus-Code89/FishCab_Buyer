@@ -12,6 +12,11 @@ class AddFishOptionPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Fish Option'),
+        toolbarHeight: 80,
+        titleSpacing: 20,
+        backgroundColor: Colors.white,
+        shadowColor: Colors.transparent,
+        titleTextStyle: const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
       ),
       body: AddFishOptionForm(),
     );

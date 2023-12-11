@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fish_cab/review-rating%20pages/make_review_screen.dart';
 import 'package:fish_cab/review-rating%20pages/view_reviews_screen.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,11 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Seller Orders'),
+        toolbarHeight: 80,
+        titleSpacing: 20,
+        backgroundColor: Colors.white,
+        shadowColor: Colors.transparent,
+        titleTextStyle: const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -163,15 +169,6 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
                   ListTile(
                     title: Row(
                       children: [
-                        Text(
-                          'Status: ',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
-                        ),
-                        Text(
-                          '${order['status']}',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: statusColor),
-                        ),
-                        SizedBox(width: 16.0), // Add space between status and Confirm button
                         ElevatedButton(
                           onPressed: () {
                             //"Confirm" button press
@@ -230,8 +227,7 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.push(
-                    context, (MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: uid)))); // Close the dialog
+                Navigator.push(context, (MaterialPageRoute(builder: (context) => ReviewView(reviewee: uid)))); // Close the dialog
               },
               child: Text('Rate Buyer'),
             ),

@@ -12,7 +12,12 @@ class FishDemandOptionsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Fish Demand Options Page'),
+        title: Text('Set Fish Demands'),
+        toolbarHeight: 80,
+        titleSpacing: 20,
+        backgroundColor: Colors.white,
+        shadowColor: Colors.transparent,
+        titleTextStyle: const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
       ),
       body: Column(
         children: [
