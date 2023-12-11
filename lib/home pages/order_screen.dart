@@ -19,8 +19,19 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
     super.build(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Orders Page'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70.0),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0, left: 10.0),
+          child: AppBar(
+            title: Text("Orders"),
+            titleSpacing: 20,
+            backgroundColor: Colors.white,
+            shadowColor: Colors.transparent,
+            titleTextStyle:
+                const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
+          ),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -77,7 +88,7 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
         },
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 4,
+        currentIndex: 3,
         onTap: (index) {
           // Handle navigation taps based on the index
           switch (index) {
@@ -85,15 +96,12 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
               Navigator.pushReplacementNamed(context, '/home');
               break;
             case 1:
-              Navigator.pushReplacementNamed(context, '/search');
-              break;
-            case 2:
               Navigator.pushReplacementNamed(context, '/map');
               break;
-            case 3:
+            case 2:
               Navigator.pushReplacementNamed(context, '/chats');
               break;
-            case 4:
+            case 3:
               Navigator.pushReplacementNamed(context, '/orders');
               break;
           }

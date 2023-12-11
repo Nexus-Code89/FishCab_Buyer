@@ -1,19 +1,21 @@
 import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/auth%20pages/auth_page.dart';
-import 'package:fish_cab/home%20pages/chats_screen.dart';
+import 'package:fish_cab/home%20pages/chat_screen.dart';
 import 'package:fish_cab/home%20pages/home_page.dart';
+import 'package:fish_cab/home%20pages/map_ongoing.dart';
 import 'package:fish_cab/home%20pages/map_page.dart';
 import 'package:fish_cab/home%20pages/notifications_screen.dart';
 import 'package:fish_cab/home%20pages/order_screen.dart';
 import 'package:fish_cab/home%20pages/search_screen.dart';
 import 'package:fish_cab/review-rating%20pages/make_review_screen.dart';
-import 'package:fish_cab/review-rating%20pages/view_reviews_screen.dart';
 import 'package:fish_cab/seller_pages/seller_fish_options_screen.dart';
 import 'package:fish_cab/seller_pages/seller_home_screen.dart';
 import 'package:fish_cab/seller_pages/seller_schedule_screen.dart';
 import 'package:fish_cab/seller_pages/seller_search_singleton.dart';
+import 'package:fish_cab/seller_side/seller_add_demand_option.dart';
 import 'package:fish_cab/seller_side/seller_add_fish_option.dart';
 import 'package:fish_cab/seller_side/seller_chats_screen.dart';
+import 'package:fish_cab/seller_side/seller_demand_page.dart';
 import 'package:fish_cab/seller_side/seller_fish_options_page.dart';
 import 'package:fish_cab/seller_side/seller_home_page.dart';
 import 'package:fish_cab/seller_side/seller_map_page.dart';
@@ -22,7 +24,6 @@ import 'package:fish_cab/seller_side/seller_schedule_page.dart';
 import 'package:fish_cab/seller_side/seller_set_location2.dart';
 import 'package:fish_cab/seller_side/seller_set_route.dart';
 import 'package:fish_cab/seller_side/seller_singleton.dart';
-import 'package:fish_cab/seller_side/seller_schedule_page.dart';
 import 'package:fish_cab/seller_side/seller_set_location1.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -47,7 +48,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: new ThemeData(scaffoldBackgroundColor: Colors.white),
+        theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme: AppBarTheme(
+            iconTheme: IconThemeData(
+              color: Colors.blue,
+            ),
+          ),
+        ),
         debugShowCheckedModeBanner: false,
         initialRoute: '/auth', // Set the initial route
         routes: {
@@ -57,7 +65,10 @@ class MyApp extends StatelessWidget {
           '/home': (context) => HomePage(),
           '/search': (context) => SearchScreen(),
           '/map': (context) => MapPage(),
-          '/chats': (context) => ChatsScreen(),
+          '/map_ongoing': (context) => MapOngoingPage(
+                sellerId: '',
+              ),
+          '/chats': (context) => ChatScreen(),
           '/orders': (context) => OrdersScreen(),
           '/notifications': (context) => NotificationsScreen(),
           '/seller_home_view': (context) => SellerHomeScreen(
@@ -77,8 +88,14 @@ class MyApp extends StatelessWidget {
           '/add_fish_option': (context) => AddFishOptionPage(
                 sellerId: SellerSingleton.instance.userId,
               ),
+          '/add_fish_demand_option': (context) => AddFishDemandOptionPage(
+                sellerId: SellerSingleton.instance.userId,
+              ),
           '/seller_schedule': (context) => SellerSchedulePage(
                 sellerId: SellerSingleton.instance.userId,
+              ),
+          '/seller_demand': (context) => SellerDemandPage(
+                sellerID: SellerSingleton.instance.userId,
               ),
           '/seller_home': (context) => SellerHomePage(),
           '/seller_chats': (context) => SellerChatsScreen(),

@@ -112,6 +112,7 @@ class SellerSetRouteState extends State<SellerSetRoute> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
                   child: Container(
+                    height: 450,
                     child: GoogleMap(
                       mapType: MapType.terrain,
                       initialCameraPosition: _kInitial,
@@ -120,7 +121,6 @@ class SellerSetRouteState extends State<SellerSetRoute> {
                         _controller.complete(controller);
                       },
                     ),
-                    height: 450,
                   ),
                 );
               } else {
@@ -129,26 +129,6 @@ class SellerSetRouteState extends State<SellerSetRoute> {
             },
           ),
         ],
-      ),
-      bottomNavigationBar: SellerNavBar(
-        currentIndex: 2, // Set the default selected index
-        onTap: (index) {
-          // Handle item taps here, based on the index
-          switch (index) {
-            case 0:
-              // Navigate to Home Page
-              Navigator.pushReplacementNamed(context, '/seller_home');
-              break;
-            case 1:
-              // Navigate to Fish Options Page
-              Navigator.pushReplacementNamed(context, '/seller_fish_options');
-              break;
-            case 3:
-              // Navigate to Chats Page
-              Navigator.pushReplacementNamed(context, '/seller_chats');
-              break;
-          }
-        },
       ),
     );
   }

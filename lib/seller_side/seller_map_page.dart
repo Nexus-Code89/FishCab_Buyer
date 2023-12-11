@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fish_cab/api/firebase_api.dart';
+import 'package:fish_cab/review-rating%20pages/view_reviews_screen.dart';
 import 'package:fish_cab/seller_pages/seller_profile_view.dart';
 import 'package:fish_cab/seller_side/seller_order_page.dart';
 import 'package:flutter/foundation.dart';
@@ -11,8 +14,6 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-
-import '../review-rating pages/view_reviews_screen.dart';
 
 class SellerMapPage extends StatefulWidget {
   @override
@@ -24,6 +25,7 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   bool get wantKeepAlive => true;
 
   // get instance of auth
+  final User? user = FirebaseAuth.instance.currentUser;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -45,8 +47,6 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   @override
   void dispose() {
     positionStream!.cancel();
-
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -55,10 +55,14 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
     LocationSettings locationSettings;
     await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((Position position) async {
       LatLng location = LatLng(position.latitude, position.longitude);
-
-      setState(() {
-        _currentPosition = location;
-        _isLoading = false;
+      await _firestore
+          .collection('seller_info')
+          .doc(_firebaseAuth.currentUser?.uid)
+          .set({'loc_current': new GeoPoint(location.latitude, location.longitude)}, SetOptions(merge: true)).then((value) {
+        setState(() {
+          _currentPosition = location;
+          _isLoading = false;
+        });
       });
     });
 
@@ -72,7 +76,7 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
       locationSettings = AppleSettings(
         accuracy: LocationAccuracy.high,
         activityType: ActivityType.fitness,
-        distanceFilter: 10,
+        distanceFilter: 50,
         pauseLocationUpdatesAutomatically: true,
         // Only set to true if our app will be started up in the background.
         showBackgroundLocationIndicator: false,
@@ -80,18 +84,52 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
     } else {
       locationSettings = const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
+        distanceFilter: 50,
       );
     }
 
-    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
       LatLng location = LatLng(position!.latitude, position.longitude);
-
-      setState(() {
-        _currentPosition = location;
-        _isLoading = false;
+      await _firestore
+          .collection('seller_info')
+          .doc(_firebaseAuth.currentUser?.uid)
+          .set({'loc_current': new GeoPoint(location.latitude, location.longitude)}, SetOptions(merge: true)).then((value) {
+        setState(() {
+          _currentPosition = location;
+          _isLoading = false;
+        });
       });
     });
+  }
+
+  sendNotif() async {
+    await _firestore.collection('seller_info').doc(user?.uid).set({'routeStarted': true}, SetOptions(merge: true));
+    QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
+        .collection("orders")
+        .where("sellerID", isEqualTo: user?.uid)
+        .where("isConfirmed", isEqualTo: "unconfirmed")
+        .get();
+
+    List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+    List<String> buyers = [];
+
+    for (var data in buyersData) {
+      buyers.add(data["userID"]);
+    }
+
+    QuerySnapshot querySnapshot_Tokens =
+        await FirebaseFirestore.instance.collection("tokens").where(FieldPath.documentId, whereIn: buyers).get();
+
+    List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
+
+    DocumentSnapshot currentUserDataSnapshot = await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
+
+    for (var data in allData) {
+      FirebaseApi().sendPushMessage(
+          "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
+          "Fresh fish is on its way!",
+          data!['token']!);
+    }
   }
 
   // get address of place from coordinates
@@ -137,7 +175,7 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
         infoWindow: InfoWindow(title: address, snippet: ''),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         onTap: () {
-          showOrderDetails(doc, buyerName!);
+          showOrderDetails(doc, buyerName);
         },
       );
       markers.add(marker);
@@ -247,7 +285,7 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
                   ),
                   SizedBox(height: 16.0),
                   ListTile(
-                    title: Row(
+                    title: Column(
                       children: [
                         Text(
                           'Status: ',
@@ -258,23 +296,27 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: statusColor),
                         ),
                         SizedBox(width: 16.0), // Add space between status and Confirm button
-                        ElevatedButton(
-                          onPressed: () {
-                            //"Confirm" button press
-                            confirmOrder(order.id, order['userID']);
-                            Navigator.pop(context);
-                          },
-                          child: Text('Confirm'),
-                        ),
-                        SizedBox(width: 16.0), // Add space between status and Confirm button
-                        ElevatedButton(
-                          onPressed: () {
-                            //"Confirm" button press
-                            Navigator.pop(context);
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: order['userID'])));
-                          },
-                          child: Text('See reviews'),
-
+                        Row(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                //"Confirm" button press
+                                confirmOrder(order.id, order['userID']);
+                                Navigator.pop(context);
+                              },
+                              child: Text('Confirm'),
+                            ),
+                            SizedBox(width: 16.0), // Add space between status and Confirm button
+                            ElevatedButton(
+                              onPressed: () {
+                                //"Confirm" button press
+                                Navigator.pop(context);
+                                Navigator.push(
+                                    context, MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: order['userID'])));
+                              },
+                              child: Text('See reviews'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -316,7 +358,8 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.push(context, (MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: uid)))); // Close the dialog
+                Navigator.push(
+                    context, (MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: uid)))); // Close the dialog
               },
               child: Text('Rate Buyer'),
             ),
@@ -330,26 +373,6 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70.0),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20.0, left: 10.0),
-          child: AppBar(
-            title: Text("Route ongoing"),
-            backgroundColor: Colors.white,
-            shadowColor: Colors.transparent,
-            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/seller_home');
-                }, // Pass the context to the function
-                icon: Icon(Icons.arrow_back, color: Colors.blue),
-              ),
-            ],
-          ),
-        ),
-      ),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -358,36 +381,43 @@ class _SellerMapPageState extends State<SellerMapPage> with AutomaticKeepAliveCl
               future: getMarkersWithinRadius(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
-                    child: Container(
-                      height: 600,
-                      child: GoogleMap(
-                        mapType: MapType.terrain,
-                        initialCameraPosition: CameraPosition(
-                          target: _currentPosition!,
-                          zoom: 14.0,
-                        ),
-                        onMapCreated: (GoogleMapController controller) {
-                          _controller.complete(controller);
-                        },
-                        markers: Set<Marker>.of(snapshot.data!),
-                        polylines: {
-                          Polyline(
-                            polylineId: const PolylineId("route"),
-                            points: polylineCoordinates,
-                            color: const Color(0xFF7B61FF),
-                            width: 6,
-                          ),
-                        },
-                      ),
+                  return GoogleMap(
+                    mapType: MapType.terrain,
+                    initialCameraPosition: CameraPosition(
+                      target: _currentPosition!,
+                      zoom: 14.0,
                     ),
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                    },
+                    markers: Set<Marker>.of(snapshot.data!),
+                    polylines: {
+                      Polyline(
+                        polylineId: const PolylineId("route"),
+                        points: polylineCoordinates,
+                        color: const Color(0xFF7B61FF),
+                        width: 6,
+                      ),
+                    },
                   );
                 } else {
                   return Text('Loading...');
                 }
               },
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await _firestore
+              .collection('seller_info')
+              .doc(_firebaseAuth.currentUser!.uid)
+              .set({'routeStarted': false}, SetOptions(merge: true)).then((value) {
+            Navigator.pop(context);
+          });
+        },
+        backgroundColor: Colors.blueAccent,
+        child: Icon(Icons.done),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
     );
   }
 }

@@ -112,10 +112,12 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         child: Padding(
           padding: const EdgeInsets.only(top: 20.0, left: 10.0),
           child: AppBar(
-            title: Text("Map"),
+            title: Text("Sellers Near You"),
+            titleSpacing: 20,
             backgroundColor: Colors.white,
             shadowColor: Colors.transparent,
-            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
+            titleTextStyle:
+                const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
           ),
         ),
       ),
@@ -130,6 +132,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
                     child: Container(
+                      height: 600,
                       child: GoogleMap(
                         mapType: MapType.terrain,
                         initialCameraPosition: CameraPosition(
@@ -151,7 +154,6 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                           )
                         },
                       ),
-                      height: 600,
                     ),
                   );
                 } else {
@@ -160,7 +162,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               },
             ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 2, // Set the default selected index
+        currentIndex: 1, // Set the default selected index
         onTap: (index) {
           // Handle item taps here, based on the index
           switch (index) {
@@ -168,15 +170,12 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               Navigator.pushReplacementNamed(context, '/home');
               break;
             case 1:
-              Navigator.pushReplacementNamed(context, '/search');
-              break;
-            case 2:
               Navigator.pushReplacementNamed(context, '/map');
               break;
-            case 3:
+            case 2:
               Navigator.pushReplacementNamed(context, '/chats');
               break;
-            case 4:
+            case 3:
               Navigator.pushReplacementNamed(context, '/orders');
               break;
           }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
+import 'package:fish_cab/seller_side/seller_fish_demand_options_page.dart';
 import 'package:flutter/material.dart';
 
 class FishOptionsPage extends StatelessWidget {
@@ -11,11 +12,25 @@ class FishOptionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Fish Options Page'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70.0),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0, left: 10.0),
+          child: AppBar(
+            title: Text("Fish Options"),
+            titleSpacing: 20,
+            backgroundColor: Colors.white,
+            shadowColor: Colors.transparent,
+            titleTextStyle:
+                const TextStyle(fontWeight: FontWeight.w800, color: Colors.black, fontSize: 20, fontFamily: 'Montserrat'),
+          ),
+        ),
       ),
       body: Column(
         children: [
+          const SizedBox(
+            height: 10,
+          ),
           Expanded(
             child: FishOptionsList(),
           ),
@@ -24,6 +39,20 @@ class FishOptionsPage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                FloatingActionButton(
+                  onPressed: () {
+                    // Navigate to FishDemandOptionsPage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FishDemandOptionsPage(sellerId: sellerId),
+                      ),
+                    );
+                  },
+                  tooltip: 'Demand',
+                  child: Icon(Icons.article),
+                ),
+                SizedBox(width: 16), // Add some space between buttons
                 FloatingActionButton(
                   onPressed: () {
                     // Navigate to AddFishOptionPage
@@ -36,34 +65,6 @@ class FishOptionsPage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: SellerNavBar(
-        currentIndex: 1, // Set the default selected index
-        onTap: (index) {
-          // Handle item taps here, based on the index
-          switch (index) {
-            case 0:
-              // Navigate to Home Page
-              Navigator.pushReplacementNamed(context, '/seller_home');
-              break;
-            case 1:
-              // Navigate to Fish Options Page
-              Navigator.pushReplacementNamed(context, '/seller_fish_options');
-              break;
-            case 2:
-              // Navigate to Schedule Page
-              Navigator.pushReplacementNamed(context, '/seller_schedule');
-              break;
-            case 3:
-              // Navigate to Chats Page
-              Navigator.pushReplacementNamed(context, '/seller_chats');
-              break;
-            case 4:
-              // Navigate to Orders Page
-              Navigator.pushReplacementNamed(context, '/seller_orders');
-              break;
-          }
-        },
       ),
     );
   }
@@ -117,33 +118,48 @@ class FishOptionsList extends StatelessWidget {
           final photoUrl = fishOptionData['photoUrl'] as String?;
           final fishName = fishOptionData['fishName'] as String?;
           final price = fishOptionData['price'] as num?;
-
-          return Card(
-            elevation: 3,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(photoUrl ?? ''),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              height: 90,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 3,
+                    blurRadius: 3,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
               ),
-              title: Text(
-                fishName ?? '',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: ListTile(
+                leading: CircleAvatar(
+                  radius: 30,
+                  backgroundImage: NetworkImage(photoUrl ?? ''),
+                ),
+                title: Text(
+                  fishName ?? '',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Montserrat'),
+                ),
+                subtitle: Text(
+                  '\$$price',
+                  style: TextStyle(fontSize: 16),
+                ),
+                trailing: IconButton(
+                  icon: Icon(
+                    Icons.delete_rounded,
+                    size: 30,
+                  ),
+                  hoverColor: Colors.blue,
+                  onPressed: () {
+                    // Call a function to delete the fish option
+                    _deleteFishOption(fishChoices[index].reference);
+                  },
+                ),
               ),
-              subtitle: Text(
-                '\$$price',
-                style: TextStyle(fontSize: 16),
-              ),
-              trailing: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  // Call a function to delete the fish option
-                  _deleteFishOption(fishChoices[index].reference);
-                },
-              ),
-              onTap: () {
-                // TODO: Handle tap on fish option
-              },
             ),
           );
         }

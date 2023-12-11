@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fish_cab/api/firebase_api.dart';
 import 'package:fish_cab/seller_side/seller_bottom_navbar.dart';
+import 'package:fish_cab/seller_side/seller_fish_options_page.dart';
+import 'package:fish_cab/seller_side/seller_map_page.dart';
+import 'package:fish_cab/seller_side/seller_schedule_page.dart';
 import 'package:flutter/material.dart';
 
 class SellerHomePage extends StatefulWidget {
@@ -32,15 +36,18 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
 
     setState(() {
       routeStarted = data['routeStarted'];
-      buttonText = routeStarted ? "Finish route" : "Start route";
       _isLoading = false;
     });
   }
 
   // sign user out method
-  void signUserOut(BuildContext context) {
-    FirebaseAuth.instance.signOut().then((_) {
-      Navigator.pushReplacementNamed(context, '/auth'); // Navigate to AuthPage
+  void signUserOut(BuildContext context) async {
+    FirebaseAuth.instance.signOut().then((_) async {
+      // Navigate to AuthPage
+      FirebaseMessaging.instance.deleteToken;
+      await FirebaseFirestore.instance.collection("tokens").doc(user?.uid).delete().then((_) {
+        Navigator.pushReplacementNamed(context, '/auth');
+      });
     }).catchError((error) {
       // Handle error, if any
       print("Error signing out: $error");
@@ -63,101 +70,263 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-              onPressed: () => signUserOut(context), // Pass the context to the function
-              icon: const Icon(Icons.logout),
-            ),
-          ],
-        ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            StreamBuilder(
-              stream: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Padding(
-                    padding: const EdgeInsets.all(25.0),
-                    child: Text(
-                      '${"Welcome, " + snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName']}!',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                  );
-                } else {
-                  return const Text('Loading...');
-                }
-              },
-            ),
-            // placeholder text
-            const Padding(
-              padding: EdgeInsets.all(25.0),
-              child: Text(
-                'To get started, set up your fish options.\n\nYou can modify your route & schedule time through the schedule tab.\n\nCommunicate with buyers through chats.',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            SafeArea(
+              child: Container(
+                color: Colors.blue[300],
+                height: 150,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => signUserOut(context), // Pass the context to the function
+                            icon: const Icon(Icons.logout, color: Colors.white),
+                          ),
+                          FutureBuilder(
+                            future: _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                  child: Text(
+                                    snapshot.data!['firstName'] + ' ' + snapshot.data!['lastName'],
+                                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, fontFamily: 'Montserrat'),
+                                  ),
+                                );
+                              } else {
+                                return const Text(
+                                  'Loading...',
+                                  style: TextStyle(fontFamily: 'Montserrat'),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      Container(
+                          width: 450,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                spreadRadius: 5,
+                                blurRadius: 5,
+                                offset: Offset(0, 0), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                          child: TextButton(
+                            onPressed: () async {
+                              routeStarted = true;
+
+                              await _firestore
+                                  .collection('seller_info')
+                                  .doc(user?.uid)
+                                  .set({'routeStarted': true}, SetOptions(merge: true));
+                              QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
+                                  .collection("orders")
+                                  .where("sellerID", isEqualTo: user?.uid)
+                                  .where("isConfirmed", isEqualTo: "unconfirmed")
+                                  .get();
+
+                              if (querySnapshot_Orders.size != 0) {
+                                List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
+                                List<String> buyers = [];
+
+                                for (var data in buyersData) {
+                                  buyers.add(data["userID"]);
+                                }
+
+                                QuerySnapshot querySnapshot_Tokens = await FirebaseFirestore.instance
+                                    .collection("tokens")
+                                    .where(FieldPath.documentId, whereIn: buyers)
+                                    .get();
+
+                                List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
+
+                                DocumentSnapshot currentUserDataSnapshot =
+                                    await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
+
+                                for (var data in allData) {
+                                  FirebaseApi().sendPushMessage(
+                                      "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
+                                      "Fresh fish is on its way!",
+                                      data!['token']!);
+                                }
+                              }
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => SellerMapPage()));
+                            },
+                            child: Text("Start Route",
+                                style: TextStyle(
+                                    color: Colors.blue, fontFamily: 'Montserrat', fontWeight: FontWeight.bold, fontSize: 15)),
+                          )),
+                    ],
+                  ),
+                ),
               ),
             ),
-
-            // start route button
-            ElevatedButton(
-                style: ButtonStyle(minimumSize: MaterialStateProperty.all(Size(200, 80))),
-                onPressed: routeStarted
-                    ? () async {
-                        routeStarted = false;
-                        setState(() {
-                          buttonText = "Start Route";
-                        });
-
-                        await _firestore
-                            .collection('seller_info')
-                            .doc(user?.uid)
-                            .set({'routeStarted': false}, SetOptions(merge: true));
-                      }
-                    : () async {
-                        routeStarted = true;
-
-                        setState(() {
-                          buttonText = "Finish Route";
-                        });
-
-                        await _firestore
-                            .collection('seller_info')
-                            .doc(user?.uid)
-                            .set({'routeStarted': true}, SetOptions(merge: true));
-                        QuerySnapshot querySnapshot_Orders = await FirebaseFirestore.instance
-                            .collection("orders")
-                            .where("sellerID", isEqualTo: user?.uid)
-                            .where("isConfirmed", isEqualTo: "unconfirmed")
-                            .get();
-
-                        List<dynamic> buyersData = querySnapshot_Orders.docs.map((doc) => doc.data()).toList();
-                        List<String> buyers = [];
-
-                        for (var data in buyersData) {
-                          buyers.add(data["userID"]);
-                        }
-
-                        QuerySnapshot querySnapshot_Tokens = await FirebaseFirestore.instance
-                            .collection("tokens")
-                            .where(FieldPath.documentId, whereIn: buyers)
-                            .get();
-
-                        List<dynamic> allData = querySnapshot_Tokens.docs.map((doc) => doc.data()).toList();
-
-                        DocumentSnapshot currentUserDataSnapshot =
-                            await FirebaseFirestore.instance.collection("users").doc(user?.uid).get();
-
-                        for (var data in allData) {
-                          FirebaseApi().sendPushMessage(
-                              "Seller ${currentUserDataSnapshot.get('firstName')} ${currentUserDataSnapshot.get('lastName')} has started route",
-                              "Fresh fish is on its way!",
-                              data!['token']!);
-                        }
-
-                        Navigator.pushReplacementNamed(context, '/seller_map');
-                      },
-                child: Text(buttonText, style: TextStyle(fontSize: 20, fontFamily: 'Montserrat'))),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.grey.shade100,
+              ),
+              padding: EdgeInsets.all(30),
+              width: 350,
+              child: const Column(
+                children: [
+                  Text(
+                    'Welcome to Fish Cab!',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Montserrat',
+                      color: Colors.blue,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'To get started, set up your fish options and schedule.\n\nCommunicate through chats and view orders through the orders tab.',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                image: const DecorationImage(
+                  image: AssetImage(
+                    'lib/images/fish_options.png',
+                  ),
+                  fit: BoxFit.contain,
+                  alignment: Alignment.centerRight,
+                  opacity: 0.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 3,
+                    blurRadius: 5,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+              ),
+              padding: EdgeInsets.all(20),
+              width: 350,
+              child: Column(
+                children: [
+                  Text(
+                    'Edit your fish options',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Montserrat',
+                      color: Colors.blue,
+                    ),
+                  ),
+                  Text(
+                    'Let customers know what\'s up for sale',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => FishOptionsPage(sellerId: user!.uid)));
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.blue),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                      ),
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      ),
+                    ),
+                    child: Text(
+                      'Fish Options',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                image: const DecorationImage(
+                  image: AssetImage(
+                    'lib/images/fish_options.png',
+                  ),
+                  fit: BoxFit.contain,
+                  alignment: Alignment.centerRight,
+                  opacity: 0.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 3,
+                    blurRadius: 5,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+              ),
+              padding: EdgeInsets.all(20),
+              width: 350,
+              child: Column(
+                children: [
+                  Text(
+                    'Set your schedule',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Montserrat',
+                      color: Colors.blue,
+                    ),
+                  ),
+                  Text(
+                    'Let customers know your route and schedule',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => SellerSchedulePage(sellerId: user!.uid)));
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.blue),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                      ),
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      ),
+                    ),
+                    child: Text(
+                      'Set now',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
         bottomNavigationBar: SellerNavBar(
@@ -166,18 +335,10 @@ class _SellerHomePageState extends State<SellerHomePage> with AutomaticKeepAlive
             // Handle item taps here, based on the index
             switch (index) {
               case 1:
-                // Navigate to Fish Options Page
-                Navigator.pushReplacementNamed(context, '/seller_fish_options');
-                break;
-              case 2:
-                // Navigate to Schedule Page
-                Navigator.pushReplacementNamed(context, '/seller_schedule');
-                break;
-              case 3:
                 // Navigate to Chats Page
                 Navigator.pushReplacementNamed(context, '/seller_chats');
                 break;
-              case 4:
+              case 2:
                 // Navigate to Orders Page
                 Navigator.pushReplacementNamed(context, '/seller_orders');
                 break;

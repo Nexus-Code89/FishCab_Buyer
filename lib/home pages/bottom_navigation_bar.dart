@@ -12,14 +12,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+      elevation: 20,
       items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: Icon(Icons.home_rounded),
           label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          label: 'Search',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.map),
@@ -34,8 +31,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: 'Order',
         ),
       ],
-      selectedLabelStyle: TextStyle(color: Colors.blue),
-      unselectedLabelStyle: TextStyle(color: Colors.grey),
+      // selectedLabelStyle: TextStyle(color: Colors.blue),
+      // unselectedLabelStyle: TextStyle(color: Colors.grey),
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+      iconSize: 25,
       type: BottomNavigationBarType.fixed,
       selectedItemColor: Colors.blue,
       unselectedItemColor: Colors.grey,

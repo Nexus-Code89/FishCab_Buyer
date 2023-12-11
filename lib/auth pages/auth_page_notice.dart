@@ -15,7 +15,7 @@ class AuthNoticePage extends StatelessWidget {
           showAccountBannedDialog(context);
         },
         child: Center(
-        child: Text('You have been redirected due to authentication notice.'),
+        child: Text(''),
       ),
       )
     );
@@ -26,7 +26,7 @@ class AuthNoticePage extends StatelessWidget {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Notice'),
-            content: Text('Account has been banned.'),
+            content: Text('Account has been banned. Please contact admin'),
             actions: [
               ElevatedButton(
                 onPressed: () {

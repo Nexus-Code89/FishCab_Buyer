@@ -54,30 +54,38 @@ class SellerHomeScreen extends StatelessWidget {
                       'Email: $sellerEmail',
                       style: TextStyle(fontSize: 16),
                     ),
-                    const SizedBox(height: 10,),
-                    ElevatedButton(
-                        onPressed: (){
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ReviewView(reviewee: userId)));
-                        },
-                        child: Text('Make review')),
-                    const SizedBox(height: 10,),
-                    ElevatedButton(
-                        onPressed: (){
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: userId)));
-                        },
-                        child: Text('View reviews')),
-                    const SizedBox(height: 10,),
-                    ElevatedButton(
-                        onPressed: (){
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ChatsPage(receiverUserEmail: sellerEmail, receiverUserID: userId)));
-                        },
-                        child: Text('Chat'))
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => ReviewView(reviewee: userId)));
+                            },
+                            child: Text('Make review')),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: userId)));
+                            },
+                            child: Text('View reviews')),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ChatsPage(receiverUserEmail: sellerEmail, receiverUserID: userId)));
+                            },
+                            child: Text('Chat')),
+                      ],
+                    )
                   ],
                 ),
               ),

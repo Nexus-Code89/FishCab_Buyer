@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fish_cab/home%20pages/cart_page.dart';
 import 'package:fish_cab/model/shopping_cart.dart';
+import 'package:fish_cab/seller_pages/seller_fish_demand_options_screen.dart';
+import 'package:fish_cab/seller_side/seller_fish_demand_options_page.dart';
 import 'package:flutter/material.dart';
 import 'seller_navigation_bar.dart';
 
@@ -38,17 +40,41 @@ class _FishOptionsScreenState extends State<FishOptionsScreen> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return CartPage(cart: myShoppingCart, sellerID: widget.sellerId, userID: userId);
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              // Navigate to FishDemandOptionsPage
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FishDemandOptionsScreen(sellerId: widget.sellerId),
+                ),
+              );
             },
+            tooltip: 'Demand',
+            backgroundColor: Colors.blueAccent,
+            child: Icon(Icons.article),
           ),
-        ),
-        backgroundColor: Colors.blueAccent,
-        child: Icon(Icons.shopping_cart),
+          SizedBox(height: 16), // Add some space between the buttons
+          FloatingActionButton(
+            onPressed: () {
+              // Navigate to CartPage
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return CartPage(cart: myShoppingCart, sellerID: widget.sellerId, userID: userId);
+                  },
+                ),
+              );
+            },
+            tooltip: 'Cart',
+            backgroundColor: Colors.blueAccent,
+            child: Icon(Icons.shopping_cart),
+          ),
+        ],
       ),
       body: FishOptionsList(sellerId: widget.sellerId, cart: myShoppingCart),
       bottomNavigationBar: SellerNavigationBar(

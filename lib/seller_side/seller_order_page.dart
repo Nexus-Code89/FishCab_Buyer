@@ -73,7 +73,7 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
         },
       ),
       bottomNavigationBar: SellerNavBar(
-        currentIndex: 4,
+        currentIndex: 2,
         onTap: (index) {
           switch (index) {
             case 0:
@@ -81,18 +81,10 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
               Navigator.pushReplacementNamed(context, '/seller_home');
               break;
             case 1:
-              // Navigate to Fish Options Page
-              Navigator.pushReplacementNamed(context, '/seller_fish_options');
-              break;
-            case 2:
-              // Navigate to Schedule Page
-              Navigator.pushReplacementNamed(context, '/seller_schedule');
-              break;
-            case 3:
               // Navigate to Chats Page
               Navigator.pushReplacementNamed(context, '/seller_chats');
               break;
-            case 4:
+            case 2:
               // Navigate to Orders Page
               Navigator.pushReplacementNamed(context, '/seller_orders');
               break;
@@ -187,17 +179,16 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
                             Navigator.pop(context);
                           },
                           child: Text('Confirm'),
-
                         ),
                         SizedBox(width: 16.0), // Add space between status and Confirm button
                         ElevatedButton(
                           onPressed: () {
                             //"Confirm" button press
                             Navigator.pop(context);
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: order['userID'])));
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: order['userID'])));
                           },
                           child: Text('See reviews'),
-
                         ),
                       ],
                     ),
@@ -239,7 +230,8 @@ class _SellerOrderPageState extends State<SellerOrderPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.push(context, (MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: uid)))); // Close the dialog
+                Navigator.push(
+                    context, (MaterialPageRoute(builder: (context) => ViewReviewView(reviewee: uid)))); // Close the dialog
               },
               child: Text('Rate Buyer'),
             ),
