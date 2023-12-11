@@ -38,7 +38,7 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
         stream: FirebaseFirestore.instance
             .collection('orders')
             .where('userID', isEqualTo: _firebaseAuth.currentUser!.uid)
-            .where('status', isEqualTo: 'pending')
+            .where('isConfirmed', isEqualTo: 'unconfirmed')
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
